@@ -1,0 +1,91 @@
+#!/usr/bin/env node
+
+import { createClient } from '@supabase/supabase-js';
+
+const SUPABASE_URL = 'https://ctinwknfafeshljudolj.supabase.co';
+const SERVICE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImN0aW53a25mYWZlc2hsanVkb2xqIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2MTg1MTY3MiwiZXhwIjoyMDc3NDI3NjcyfQ.FabQInOhgs_I1GpuNIXTsA1pbqYL3VSJZqn4KnIACC4';
+
+const supabase = createClient(SUPABASE_URL, SERVICE_KEY, {
+  auth: { persistSession: false }
+});
+
+const NEW_ADMIN_EMAIL = 'com.akshat.dev@gmail.com';
+const NEW_ADMIN_NAME = 'Akshat Dev';
+const DEFAULT_PASSWORD = process.argv[2] || 'Sehajveer1998'; // Allow password as argument
+
+async function addAdmin() {
+  console.log('👤 Adding admin user:', NEW_ADMIN_EMAIL);
+  console.log('');
+  
+  try {
+    // Check if user exists
+    const { data: { users } } = await supabase.auth.admin.listUsers();
+    let user = users?.find(u => u.email === NEW_ADMIN_EMAIL);
+    
+    if (!user) {
+      console.log('📧 Creating user...');
+      const { data: newUser, error: createError } = await supabase.auth.admin.createUser({
+        email: NEW_ADMIN_EMAIL,
+        password: DEFAULT_PASSWORD,
+        email_confirm: true
+      });
+      
+      if (createError) {
+        console.error('❌ Error creating user:', createError.message);
+        console.log('\n📝 MANUAL STEPS:');
+        console.log('1. Go to: https://supabase.com/dashboard/project/ctinwknfafeshljudolj/auth/users');
+        console.log('2. Click "Add User"');
+        console.log(`3. Email: ${NEW_ADMIN_EMAIL}`);
+        console.log(`4. Password: ${DEFAULT_PASSWORD} (or your choice)`);
+        console.log('5. Auto Confirm: Yes');
+        console.log('6. Then run the SQL from: supabase/add-admin.sql\n');
+        process.exit(1);
+      }
+      
+      user = newUser.user;
+      console.log('✅ User created!\n');
+    } else {
+      console.log('✓ User already exists\n');
+    }
+    
+    // Create/update admin profile
+    console.log('🔧 Setting up admin profile...');
+    const { error: profileError } = await supabase
+      .from('profiles')
+      .upsert({
+        id: user.id,
+        full_name: NEW_ADMIN_NAME,
+        role: 'admin',
+        kyc_status: 'approved'
+      }, { onConflict: 'id' });
+    
+    if (profileError) {
+      console.error('❌ Error creating profile:', profileError.message);
+      console.log('\n📝 Run this SQL in Supabase SQL Editor instead:\n');
+      console.log(`INSERT INTO public.profiles (id, full_name, role, kyc_status)`);
+      console.log(`VALUES ('${user.id}', '${NEW_ADMIN_NAME}', 'admin', 'approved')`);
+      console.log(`ON CONFLICT (id) DO UPDATE SET role = 'admin', kyc_status = 'approved';\n`);
+    } else {
+      console.log('✅ Admin profile configured!\n');
+    }
+    
+    console.log('='.repeat(80));
+    console.log('✅ ADMIN USER READY:');
+    console.log(`   Email: ${NEW_ADMIN_EMAIL}`);
+    console.log(`   Password: ${DEFAULT_PASSWORD}`);
+    console.log(`   Name: ${NEW_ADMIN_NAME}`);
+    console.log(`   Role: admin`);
+    console.log(`   KYC: approved`);
+    console.log('='.repeat(80));
+    console.log('');
+    
+  } catch (err) {
+    console.error('Error:', err.message);
+    process.exit(1);
+  }
+}
+
+addAdmin().catch(console.error);
+
+
+
