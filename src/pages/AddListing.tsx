@@ -42,13 +42,15 @@ export default function AddListing() {
   const [content, setContent] = useState('');
   const [condition, setCondition] = useState('Good');
   const [customStatus, setCustomStatus] = useState('T2');
+  const [inventoryType, setInventoryType] = useState<'bonded_warehouse' | 'through_brand' | 'other'>('bonded_warehouse');
   const [warehouseId, setWarehouseId] = useState<string>('');
+  const [customWarehouseName, setCustomWarehouseName] = useState<string>('');
   const [incoterm, setIncoterm] = useState(incoterms[0]);
   const [leadTime, setLeadTime] = useState(leadTimes[1]);
 
   const [bottlesPerCase, setBottlesPerCase] = useState<number>(0);
   const [price, setPrice] = useState<number>(0);
-  const finalPrice = useMemo(() => Number((price * 0.98).toFixed(2)), [price]);
+  // Platform fees are calculated at checkout, not during listing creation
 
   const [abv, setAbv] = useState<number | ''>('');
   const [refillable, setRefillable] = useState<'yes'|'no'>('yes');
@@ -63,6 +65,7 @@ export default function AddListing() {
   const [countries, setCountries] = useState<string[]>([]);
 
   const [warehouses, setWarehouses] = useState<{id:string;name:string}[]>([]);
+  const [bondedWarehouses, setBondedWarehouses] = useState<{id:string;name:string}[]>([]);
 
   const [currency, setCurrency] = useState('EUR');
   const [duty, setDuty] = useState<'duty_paid' | 'under_bond'>('duty_paid');
@@ -74,6 +77,8 @@ export default function AddListing() {
       setUserId(user.id);
       const { data } = await supabase.from('warehouses').select('id,name').order('name');
       setWarehouses((data as any[]) || []);
+      const { data: bondedData } = await supabase.from('bonded_warehouses').select('id,name').eq('is_active', true).order('name');
+      setBondedWarehouses((bondedData as any[]) || []);
       // Prefill for edit mode
       if (editId) {
         const { data: listing } = await (supabase as any)
@@ -96,7 +101,9 @@ export default function AddListing() {
           setExpiry(listing.expiry_date || '');
           setCondition(listing.condition || 'Good');
           setCustomStatus(listing.custom_status || 'T2');
+          setInventoryType(listing.inventory_type || 'bonded_warehouse');
           setWarehouseId(listing.warehouse_id || '');
+          setCustomWarehouseName(listing.custom_warehouse_name || '');
           setIncoterm(listing.incoterm || incoterms[0]);
           setLeadTime(listing.lead_time || leadTimes[1]);
           if (Array.isArray(listing.image_urls)) setImagePreviews(listing.image_urls);
@@ -146,7 +153,8 @@ export default function AddListing() {
     if (quantity <= 0) return 'Quantity must be greater than zero';
     if (packaging === 'case' && bottlesPerCase <= 0) return 'Bottles per case must be set';
     if (price <= 0) return 'Price must be greater than zero';
-    if (!warehouseId) return 'Warehouse is required';
+    if (inventoryType === 'bonded_warehouse' && !warehouseId) return 'Bonded warehouse is required';
+    if (inventoryType === 'other' && !customWarehouseName.trim()) return 'Custom warehouse name is required';
     return '';
   };
 
@@ -164,7 +172,7 @@ export default function AddListing() {
         _content: content,
         _bottles_per_case: packaging === 'case' ? bottlesPerCase : null,
         _price: price,
-        _final_price: Number((price * 0.98).toFixed(2)),
+        _final_price: price, // Platform fees calculated at checkout, not here
         _abv: null,
         _refillable: true,
         _expiry_date: null,
@@ -200,13 +208,15 @@ export default function AddListing() {
             quantity: quantity, min_quantity: minQty,
             content,
             bottles_per_case: packaging === 'case' ? bottlesPerCase : null,
-            price, final_price: finalPrice,
+            price, final_price: price, // Platform fees calculated at checkout
             abv: abv === '' ? null : Number(abv),
             refillable: refillable === 'yes',
             expiry_date: expiry || null,
             condition: condition,
             custom_status: customStatus,
-            warehouse_id: warehouseId || null,
+            inventory_type: inventoryType,
+            warehouse_id: inventoryType === 'bonded_warehouse' ? warehouseId || null : null,
+            custom_warehouse_name: inventoryType === 'other' ? customWarehouseName : null,
             incoterm, lead_time: leadTime,
             image_urls: imagePreviews.concat([]),
             currency, duty,
@@ -227,13 +237,15 @@ export default function AddListing() {
         _content: content,
         _bottles_per_case: packaging === 'case' ? bottlesPerCase : null,
         _price: price,
-        _final_price: finalPrice,
+        _final_price: price, // Platform fees calculated at checkout, not here
         _abv: abv === '' ? null : Number(abv),
         _refillable: refillable === 'yes',
         _expiry_date: expiry || null,
         _condition: condition,
         _custom_status: customStatus,
-        _warehouse_id: warehouseId || null,
+        _inventory_type: inventoryType,
+        _warehouse_id: inventoryType === 'bonded_warehouse' ? warehouseId || null : null,
+        _custom_warehouse_name: inventoryType === 'other' ? customWarehouseName : null,
         _incoterm: incoterm,
         _lead_time: leadTime,
         _ui_status: 'draft',
@@ -248,7 +260,7 @@ export default function AddListing() {
 
       toast.success('Saved as draft. You can Make Live from My Stock.');
       if (addAnother) {
-        setProductName(''); setCategory(''); setSubcategory(''); setPackaging('bottle'); setQuantity(0); setMinQty(1); setContent(''); setCondition('Good'); setCustomStatus('T2'); setWarehouseId(''); setIncoterm(incoterms[0]); setLeadTime(leadTimes[1]); setBottlesPerCase(0); setPrice(0); setAbv(''); setRefillable('yes'); setExpiry(''); clearImages(); setCountries([]);
+        setProductName(''); setCategory(''); setSubcategory(''); setPackaging('bottle'); setQuantity(0); setMinQty(1); setContent(''); setCondition('Good'); setCustomStatus('T2'); setInventoryType('bonded_warehouse'); setWarehouseId(''); setCustomWarehouseName(''); setIncoterm(incoterms[0]); setLeadTime(leadTimes[1]); setBottlesPerCase(0); setPrice(0); setAbv(''); setRefillable('yes'); setExpiry(''); clearImages(); setCountries([]);
         return;
       }
       navigate('/my-stock');
@@ -258,15 +270,15 @@ export default function AddListing() {
   };
 
   return (
-    <div className="container py-8 px-4 space-y-8">
+    <div className="container py-4 md:py-8 px-4 space-y-4 md:space-y-8">
       <div className="space-y-2">
-        <h1 className="text-3xl font-display font-semibold text-light">{isEdit ? 'Edit Listing' : 'Add Listing'}</h1>
+        <h1 className="text-2xl sm:text-3xl font-display font-semibold text-foreground">{isEdit ? 'Edit Listing' : 'Add Listing'}</h1>
         <p className="text-muted-foreground">General Product Information</p>
         <div className="text-xs text-muted-foreground">Please fill in all the required fields to publish your product to live offers. For saving a draft, only product name is mandatory.</div>
       </div>
 
       {/* Product Basics */}
-      <div className="card space-y-4">
+      <div className="rounded-2xl border bg-card p-6 space-y-4">
         <Input label="Product Name" value={productName} onChange={(e) => setProductName(e.target.value.slice(0,100))} required />
 
         <div className="grid md:grid-cols-2 gap-4">
@@ -295,9 +307,9 @@ export default function AddListing() {
         <div className="grid md:grid-cols-3 gap-4">
           <div className="grid gap-2">
             <Label>Packaging</Label>
-            <div className="inline-flex rounded-md border border-dark-light overflow-hidden">
-              <button className={`px-4 py-2 ${packaging==='case'?'bg-gold text-dark':'bg-dark-light text-light'}`} onClick={() => setPackaging('case')}>Cases</button>
-              <button className={`px-4 py-2 ${packaging==='bottle'?'bg-gold text-dark':'bg-dark-light text-light'}`} onClick={() => setPackaging('bottle')}>Bottles</button>
+            <div className="inline-flex rounded-md border border-border overflow-hidden">
+              <button className={`px-4 py-2 ${packaging==='case'?'bg-primary text-primary-foreground':'bg-muted text-foreground'}`} onClick={() => setPackaging('case')}>Cases</button>
+              <button className={`px-4 py-2 ${packaging==='bottle'?'bg-primary text-primary-foreground':'bg-muted text-foreground'}`} onClick={() => setPackaging('bottle')}>Bottles</button>
             </div>
           </div>
           <Input label="Quantity" type="number" value={quantity} onChange={(e) => setQuantity(Number(e.target.value))} required />
@@ -336,16 +348,48 @@ export default function AddListing() {
           </div>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-4">
+        <div className="space-y-4">
           <div className="grid gap-2">
-            <Label>Warehouse</Label>
-            <Select value={warehouseId} onValueChange={setWarehouseId}>
-              <SelectTrigger><SelectValue placeholder="Select Warehouse" /></SelectTrigger>
+            <Label>Inventory Location *</Label>
+            <Select value={inventoryType} onValueChange={(v) => { setInventoryType(v as any); setWarehouseId(''); setCustomWarehouseName(''); }}>
+              <SelectTrigger><SelectValue placeholder="Select Inventory Type" /></SelectTrigger>
               <SelectContent>
-                {warehouses.map(w => <SelectItem key={w.id} value={w.id}>{w.name}</SelectItem>)}
+                <SelectItem value="bonded_warehouse">Bonded Warehouse</SelectItem>
+                <SelectItem value="through_brand">Through Brand</SelectItem>
+                <SelectItem value="other">Others</SelectItem>
               </SelectContent>
             </Select>
           </div>
+          {inventoryType === 'bonded_warehouse' && (
+            <div className="grid gap-2">
+              <Label>Bonded Warehouse *</Label>
+              {bondedWarehouses.length > 0 ? (
+              <Select value={warehouseId} onValueChange={setWarehouseId}>
+                <SelectTrigger><SelectValue placeholder="Select Bonded Warehouse" /></SelectTrigger>
+                <SelectContent>
+                    {bondedWarehouses.map(w => <SelectItem key={w.id} value={w.id}>{w.name}</SelectItem>)}
+                </SelectContent>
+              </Select>
+              ) : (
+                <div className="rounded-md border border-input bg-muted px-3 py-2 text-sm text-muted-foreground">
+                  No bonded warehouses available. Please add warehouses in Admin Panel first.
+                </div>
+              )}
+            </div>
+          )}
+          {inventoryType === 'other' && (
+            <div className="grid gap-2">
+              <Label>Custom Warehouse Name *</Label>
+              <Input
+                value={customWarehouseName}
+                onChange={(e) => setCustomWarehouseName(e.target.value)}
+                placeholder="Enter warehouse name"
+              />
+            </div>
+          )}
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-4">
           <div className="grid gap-2">
             <Label>Incoterms</Label>
             <Select value={incoterm} onValueChange={setIncoterm}>
@@ -368,14 +412,15 @@ export default function AddListing() {
       </div>
 
       {/* Pricing */}
-      <div className="card space-y-4">
+      <div className="rounded-2xl border bg-card p-6 space-y-4">
         {packaging === 'bottle' ? (
-          <div className="grid md:grid-cols-3 gap-4">
+          <div className="grid md:grid-cols-2 gap-4">
             <Input label="Price per Bottle (€)" type="number" min={0} step="0.01" value={price} onChange={(e)=>setPrice(Number(e.target.value))} required />
             <div className="grid gap-2">
-              <Label>Final Price Received (€)</Label>
-              <div className="input-field">{finalPrice}</div>
-              <div className="text-xs text-muted-foreground">Trade fee 2% included</div>
+              <Label>Note</Label>
+              <div className="rounded-md border border-input bg-muted/50 px-3 py-2 text-sm text-muted-foreground">
+                Platform fees (category-based) will be deducted at checkout. The price you enter here is what buyers will see.
+              </div>
             </div>
           </div>
         ) : (
@@ -383,45 +428,46 @@ export default function AddListing() {
             <Input label="Bottles per Case" type="number" min={1} value={bottlesPerCase} onChange={(e)=>setBottlesPerCase(Number(e.target.value))} required />
             <Input label="Price per Case (€)" type="number" min={0} step="0.01" value={price} onChange={(e)=>setPrice(Number(e.target.value))} required />
             <div className="grid gap-2">
-              <Label>Final Price Received (€)</Label>
-              <div className="input-field">{finalPrice}</div>
-              <div className="text-xs text-muted-foreground">Trade fee 2% included</div>
+              <Label>Note</Label>
+              <div className="rounded-md border border-input bg-muted/50 px-3 py-2 text-sm text-muted-foreground">
+                Platform fees (category-based) will be deducted at checkout. The price you enter here is what buyers will see.
+              </div>
             </div>
           </div>
         )}
       </div>
 
       {/* Additional Info */}
-      <div className="card grid md:grid-cols-3 gap-4">
+      <div className="rounded-2xl border bg-card p-6 grid md:grid-cols-3 gap-4">
         <Input label="ABV % (Optional)" type="number" value={abv} onChange={(e)=>setAbv(e.target.value===''? '': Number(e.target.value))} />
         <div className="grid gap-2">
           <Label>Refillable</Label>
-          <div className="inline-flex rounded-md border border-dark-light overflow-hidden">
-            <button className={`px-4 py-2 ${refillable==='yes'?'bg-gold text-dark':'bg-dark-light text-light'}`} onClick={()=>setRefillable('yes')}>Yes</button>
-            <button className={`px-4 py-2 ${refillable==='no'?'bg-gold text-dark':'bg-dark-light text-light'}`} onClick={()=>setRefillable('no')}>No</button>
+          <div className="inline-flex rounded-md border border-border overflow-hidden">
+            <button className={`px-4 py-2 ${refillable==='yes'?'bg-primary text-primary-foreground':'bg-muted text-foreground'}`} onClick={()=>setRefillable('yes')}>Yes</button>
+            <button className={`px-4 py-2 ${refillable==='no'?'bg-primary text-primary-foreground':'bg-muted text-foreground'}`} onClick={()=>setRefillable('no')}>No</button>
           </div>
         </div>
         <div className="grid gap-2">
           <Label>Expiry Date (Optional)</Label>
-          <input type="date" className="input-field" value={expiry} onChange={(e)=>setExpiry(e.target.value)} />
+          <input type="date" className="rounded-md border border-input bg-background px-3 py-2 text-sm" value={expiry} onChange={(e)=>setExpiry(e.target.value)} />
         </div>
       </div>
 
       {/* Product Images */}
-      <div className="card space-y-4">
+      <div className="rounded-2xl border bg-card p-6 space-y-4">
         <div className="text-sm text-muted-foreground">Up to 3 images allowed. Supported file types: JPEG, PNG. File size - up to 5MB.</div>
-        <label className="border-2 border-dashed rounded-lg p-6 text-center cursor-pointer hover:border-gold/50 transition-all">
+        <label className="border-2 border-dashed rounded-lg p-6 text-center cursor-pointer hover:border-primary/40 transition-all">
           <input type="file" accept="image/*" multiple hidden onChange={(e)=>onImages(e.target.files)} />
-          <Upload className="w-8 h-8 text-gold mx-auto mb-2" />
-          <div className="text-light">Add Product Images (optional)</div>
+          <Upload className="w-8 h-8 text-primary mx-auto mb-2" />
+          <div className="text-foreground">Add Product Images (optional)</div>
         </label>
         {imagePreviews.length > 0 && (
           <div className="flex gap-3 flex-wrap">
             {imagePreviews.map((src, idx) => (
               <div key={idx} className="relative w-28 h-28 border rounded-md overflow-hidden">
                 <img src={src} alt="preview" className="object-cover w-full h-full" />
-                <button className="absolute top-1 right-1 bg-dark/70 rounded-full p-1" onClick={() => { const next = [...images]; next.splice(idx,1); setImages(next); const p=[...imagePreviews]; URL.revokeObjectURL(p[idx]); p.splice(idx,1); setImagePreviews(p); }}>
-                  <X className="w-4 h-4 text-light" />
+                <button className="absolute top-1 right-1 bg-background/80 rounded-full p-1 border border-border" onClick={() => { const next = [...images]; next.splice(idx,1); setImages(next); const p=[...imagePreviews]; URL.revokeObjectURL(p[idx]); p.splice(idx,1); setImagePreviews(p); }}>
+                  <X className="w-4 h-4 text-foreground" />
                 </button>
               </div>
             ))}
@@ -430,18 +476,52 @@ export default function AddListing() {
       </div>
 
       {/* Restricted Markets */}
-      <div className="card space-y-3">
+      <div className="rounded-2xl border bg-card p-6 space-y-3">
         <div className="text-sm text-muted-foreground">If no restrictions applied, your product will be sold worldwide. If exclude is applied, your product will not be sold in selected countries. If include is applied, your product will only be sold in selected countries.</div>
-        <Button variant="outline" onClick={()=>setRestrictionsOpen(true)}>+ APPLY MARKET RESTRICTIONS</Button>
+        <Button 
+          variant="outline" 
+          onClick={()=>setRestrictionsOpen(true)}
+          size="md"
+        >
+          + Apply Market Restrictions
+        </Button>
       </div>
 
       {/* Actions */}
-      <div className="flex items-center gap-3">
-        <Button variant="outline" onClick={saveDraft}>SAVE AS DRAFT</Button>
-        <div className="flex-1" />
-        <Button variant="secondary" onClick={()=>submit(false)}>SUBMIT</Button>
-        <Button onClick={()=>submit(true)}>SUBMIT & ADD ANOTHER</Button>
-        <Button variant="ghost" onClick={()=>navigate('/my-stock')}>CANCEL</Button>
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-4 border-t">
+        <Button 
+          variant="outline" 
+          onClick={saveDraft}
+          size="md"
+          className="sm:flex-none"
+        >
+          Save as Draft
+        </Button>
+        <div className="flex-1 hidden sm:block" />
+        <Button 
+          variant="secondary" 
+          onClick={()=>submit(false)}
+          size="md"
+          className="sm:flex-none"
+        >
+          Submit
+        </Button>
+        <Button 
+          variant="primary"
+          onClick={()=>submit(true)}
+          size="md"
+          className="sm:flex-none"
+        >
+          Submit & Add Another
+        </Button>
+        <Button 
+          variant="ghost" 
+          onClick={()=>navigate('/my-stock')}
+          size="md"
+          className="sm:flex-none"
+        >
+          Cancel
+        </Button>
       </div>
 
       {/* Restrictions modal */}
@@ -449,14 +529,15 @@ export default function AddListing() {
         <DialogContent>
           <DialogHeader><DialogTitle>Market Restrictions</DialogTitle></DialogHeader>
           <div className="grid gap-4">
-            <div className="inline-flex rounded-md border border-dark-light overflow-hidden w-max">
-              <button className={`px-4 py-2 ${restrictionType==='exclude'?'bg-gold text-dark':'bg-dark-light text-light'}`} onClick={()=>setRestrictionType('exclude')}>Exclude</button>
-              <button className={`px-4 py-2 ${restrictionType==='include'?'bg-gold text-dark':'bg-dark-light text-light'}`} onClick={()=>setRestrictionType('include')}>Include</button>
+            <div className="inline-flex rounded-md border border-border overflow-hidden w-max">
+              <button className={`px-4 py-2 ${restrictionType==='exclude'?'bg-primary text-primary-foreground':'bg-muted text-foreground'}`} onClick={()=>setRestrictionType('exclude')}>Exclude</button>
+              <button className={`px-4 py-2 ${restrictionType==='include'?'bg-primary text-primary-foreground':'bg-muted text-foreground'}`} onClick={()=>setRestrictionType('include')}>Include</button>
             </div>
             <Textarea placeholder="Enter country names separated by commas (e.g., India, France, Germany)" value={countries.join(', ')} onChange={(e)=>setCountries(e.target.value.split(',').map(s=>s.trim()).filter(Boolean))} />
           </div>
           <DialogFooter>
-            <Button variant="secondary" onClick={()=>setRestrictionsOpen(false)}>Done</Button>
+            <Button variant="outline" onClick={()=>setRestrictionsOpen(false)} size="md">Cancel</Button>
+            <Button variant="secondary" onClick={()=>setRestrictionsOpen(false)} size="md">Done</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

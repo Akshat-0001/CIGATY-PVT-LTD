@@ -22,10 +22,10 @@ const Button = ({
   const baseStyles = 'rounded-lg font-semibold transition-all duration-300 ease-in-out active:scale-95 inline-flex items-center justify-center';
   
   const variants = {
-    primary: 'bg-wine text-light hover:bg-wine-light shadow-[0_4px_20px_rgba(139,0,0,0.3)] disabled:bg-wine/50',
-    secondary: 'bg-gold text-dark hover:bg-gold-light shadow-[0_4px_20px_rgba(212,175,55,0.3)] disabled:bg-gold/50',
-    outline: 'border-2 border-gold text-gold hover:bg-gold hover:text-dark hover:shadow-[0_4px_20px_rgba(212,175,55,0.3)] disabled:border-gold/50 disabled:text-gold/50',
-    ghost: 'text-gold hover:bg-gold/10 disabled:text-gold/50',
+    primary: 'bg-primary text-primary-foreground hover:bg-primary/90 shadow-md disabled:bg-primary/50',
+    secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/90 shadow-md disabled:bg-secondary/50',
+    outline: 'border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground hover:shadow-md disabled:border-primary/50 disabled:text-primary/50',
+    ghost: 'text-foreground hover:bg-muted disabled:text-muted-foreground',
   };
 
   const sizes = {

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
 import { Mail, Lock, Eye, EyeOff, AlertCircle } from 'lucide-react';
@@ -9,6 +9,7 @@ import { authHelpers } from '../lib/supabase';
 
 const Login = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -76,9 +77,9 @@ const Login = () => {
 
       if (data) {
         toast.success('Welcome back! Redirecting...', { id: loginToast });
-        // Successful login - redirect to live-offers
+        const from = (location.state as any)?.from || '/live-offers';
         setTimeout(() => {
-          navigate('/live-offers');
+          navigate(from, { replace: true });
         }, 1000);
       }
     } catch (error: any) {
@@ -89,32 +90,7 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-dark py-12 px-4 sm:px-6 lg:px-8">
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?q=80&w=2070')] bg-cover bg-center opacity-10" />
-        <div className="absolute inset-0 hero-gradient" />
-        
-        {/* Floating particles */}
-        {[...Array(15)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute w-2 h-2 bg-gold/20 rounded-full"
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-            }}
-            animate={{
-              y: [0, -20, 0],
-              opacity: [0.2, 0.5, 0.2],
-            }}
-            transition={{
-              duration: 3 + Math.random() * 2,
-              repeat: Infinity,
-              delay: Math.random() * 2,
-            }}
-          />
-        ))}
-      </div>
+    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -136,13 +112,13 @@ const Login = () => {
               />
             </motion.div>
             <div>
-              <h2 className="text-3xl font-bold text-light font-display">CIGATY</h2>
-              <p className="text-xs text-gold">India's First B2B Liquor Exchange</p>
+              <h2 className="text-3xl font-bold font-display" style={{ color: '#D4AF37' }}>CIGATY</h2>
+              <p className="text-xs text-muted-foreground">India's First B2B Liquor Exchange</p>
             </div>
           </Link>
           
-          <h1 className="text-3xl font-bold text-light font-display">Welcome Back</h1>
-          <p className="mt-2 text-gray-400">
+          <h1 className="text-3xl font-bold text-foreground font-display">Welcome Back</h1>
+          <p className="mt-2 text-muted-foreground">
             Sign in to your account to continue
           </p>
         </div>
@@ -152,7 +128,7 @@ const Login = () => {
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.2, duration: 0.4 }}
-          className="card bg-dark-lighter/80 backdrop-blur-lg"
+          className="card bg-card/95 backdrop-blur-lg border-2 border-primary/20 hover:border-primary/40 transition-all"
         >
           {generalError && (
             <motion.div
@@ -161,7 +137,7 @@ const Login = () => {
               className="mb-6 p-4 bg-wine/20 border border-wine rounded-lg flex items-start"
             >
               <AlertCircle className="w-5 h-5 text-wine mr-3 flex-shrink-0 mt-0.5" />
-              <p className="text-sm text-light">{generalError}</p>
+              <p className="text-sm text-foreground">{generalError}</p>
             </motion.div>
           )}
 
@@ -206,12 +182,13 @@ const Login = () => {
                   className="w-4 h-4 rounded border-dark-light bg-dark text-wine 
                            focus:ring-wine focus:ring-offset-dark"
                 />
-                <span className="ml-2 text-sm text-gray-400">Remember me</span>
+                <span className="ml-2 text-sm text-muted-foreground">Remember me</span>
               </label>
 
               <Link
                 to="/forgot-password"
-                className="text-sm text-gold hover:text-gold-light transition-colors"
+                className="text-sm transition-colors"
+                style={{ color: '#D4AF37' }}
               >
                 Forgot password?
               </Link>
@@ -230,11 +207,12 @@ const Login = () => {
         </motion.div>
 
         {/* Sign Up Link */}
-        <p className="text-center text-gray-400">
+        <p className="text-center text-muted-foreground">
           Don't have an account?{' '}
           <Link
             to="/register"
-            className="text-gold hover:text-gold-light font-semibold transition-colors"
+            className="text-primary hover:text-primary/80 font-semibold transition-colors"
+            style={{ color: '#D4AF37' }}
           >
             Sign up for free
           </Link>

@@ -98,13 +98,13 @@ export default function AdminUsers() {
   const rowCols = isPending ? "grid grid-cols-[2fr,1.6fr,1.2fr,1.8fr,2fr,auto]" : "grid grid-cols-[2fr,1.6fr,1.2fr,1.8fr,2fr]";
 
   return (
-    <div className="container py-8 px-4 space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-display font-semibold">Admin • User Verification</h1>
+    <div className="container py-4 md:py-8 px-4 space-y-4 md:space-y-6">
+      <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+        <h1 className="text-xl sm:text-2xl md:text-3xl font-display font-semibold">Admin • User Verification</h1>
         <div className="flex items-center gap-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="gap-2">Status: {statusTab} <ChevronDown className="h-4 w-4"/></Button>
+              <Button variant="outline" size="sm" className="gap-2 w-full md:w-auto">Status: {statusTab} <ChevronDown className="h-4 w-4"/></Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               {['pending','approved','rejected'].map(s=> (
@@ -116,11 +116,11 @@ export default function AdminUsers() {
       </div>
 
       <div className="flex items-center gap-2 mb-4">
-        <Input placeholder="Search users" value={search} onChange={(e)=>setSearch(e.target.value)} className="max-w-sm"/>
+        <Input placeholder="Search users" value={search} onChange={(e)=>setSearch(e.target.value)} className="w-full md:max-w-sm"/>
       </div>
 
       <div className="rounded-xl border bg-card overflow-hidden">
-        <div className={`${headerCols} gap-4 p-4 border-b bg-muted/40 font-medium text-sm`}>
+        <div className={`hidden md:${headerCols.replace('grid ', '')} gap-4 p-4 border-b bg-muted/40 font-medium text-sm`}>
           <div>User</div>
           <div>Company</div>
           <div>Reg No</div>
@@ -144,37 +144,45 @@ export default function AdminUsers() {
                 {DOC_LABEL[t]}
               </a>
             ) : (
-              <Badge key={t} variant={color} className="mr-1">{DOC_LABEL[t]}</Badge>
+              <Badge key={t} variant={color} className="mr-1 text-xs">{DOC_LABEL[t]}</Badge>
             );
           };
           const profileStatus = r.profile_status || r.status || 'pending';
           return (
-            <div key={uid} className={`${rowCols} gap-4 p-4 border-b last:border-b-0 hover:bg-muted/30`}>
+            <div key={uid} className={`md:${rowCols.replace('grid ', '')} grid-cols-1 gap-4 p-4 border-b last:border-b-0 hover:bg-muted/30`}>
               <div className="min-w-0">
-                <div className="truncate font-medium">{r.full_name || '—'}</div>
+                <div className="flex items-center justify-between mb-2">
+                  <div className="truncate font-medium">{r.full_name || '—'}</div>
+                  <Badge variant={profileStatus==='approved'?'secondary': profileStatus==='rejected'?'destructive':'outline'} className="shrink-0 ml-2">{profileStatus}</Badge>
+                </div>
                 <div className="text-xs text-muted-foreground truncate">{r.email || '—'}</div>
                 <div className="text-xs text-muted-foreground truncate">{r.phone || '—'}</div>
-                <div className="flex gap-2 mt-1">
-                  <Badge variant={profileStatus==='approved'?'secondary': profileStatus==='rejected'?'destructive':'outline'}>{profileStatus}</Badge>
-                </div>
               </div>
               <div className="min-w-0">
+                <div className="text-xs text-muted-foreground md:hidden">Company</div>
                 <div className="truncate">{c?.name || r.company_name || '—'}</div>
               </div>
-              <div>{r.registration_no || r.gst_number || '—'}</div>
+              <div>
+                <div className="text-xs text-muted-foreground md:hidden mb-1">Reg No</div>
+                <div>{r.registration_no || r.gst_number || '—'}</div>
+              </div>
               <div className="min-w-0">
+                <div className="text-xs text-muted-foreground md:hidden mb-1">Location</div>
                 <div className="truncate text-sm">{r.country || '—'}</div>
                 <div className="truncate text-xs text-muted-foreground">{r.address || '—'}</div>
               </div>
-              <div className="flex items-center flex-wrap">
-                {['photo_id','company_registration_doc','proof_of_address','vat_certificate'].map(chip)}
-                <span className="text-xs text-muted-foreground ml-2">{uploadedCount}/4</span>
-                <Button size="sm" variant="ghost" className="ml-1" onClick={()=> openAllDocs(uid)}>Open all</Button>
+              <div className="flex flex-col gap-2">
+                <div className="text-xs text-muted-foreground md:hidden">Documents</div>
+                <div className="flex items-center flex-wrap gap-1">
+                  {['photo_id','company_registration_doc','proof_of_address','vat_certificate'].map(chip)}
+                  <span className="text-xs text-muted-foreground ml-2">{uploadedCount}/4</span>
+                </div>
+                <Button size="sm" variant="ghost" className="w-full md:w-auto" onClick={()=> openAllDocs(uid)}>Open all</Button>
               </div>
               {isPending && (
-                <div className="flex gap-2">
-                  <Button size="sm" onClick={async ()=>{ await (supabase as any).rpc('approve_user',{ _user_id: uid }); location.reload();}}>Approve</Button>
-                  <Button size="sm" variant="destructive" onClick={async ()=>{ await (supabase as any).rpc('reject_user',{ _user_id: uid, _reason: 'Not eligible' }); location.reload();}}>Reject</Button>
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <Button size="sm" className="w-full sm:w-auto" onClick={async ()=>{ await (supabase as any).rpc('approve_user',{ _user_id: uid }); location.reload();}}>Approve</Button>
+                  <Button size="sm" variant="destructive" className="w-full sm:w-auto" onClick={async ()=>{ await (supabase as any).rpc('reject_user',{ _user_id: uid, _reason: 'Not eligible' }); location.reload();}}>Reject</Button>
                 </div>
               )}
             </div>

@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { toTitleCase } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -180,14 +181,14 @@ export default function AdminApprovals() {
   const copy = (text: string) => navigator.clipboard?.writeText(text).catch(() => {});
 
   return (
-    <div className="container py-8 px-4 space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-display font-semibold">Listings Approvals</h1>
-        <div className="flex items-center gap-2">
+    <div className="container py-4 md:py-8 px-4 space-y-4 md:space-y-6">
+      <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+        <h1 className="text-xl sm:text-2xl md:text-3xl font-display font-semibold">Listings Approvals</h1>
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
           {bulkIds.length > 0 && (
             <>
-              <Button size="sm" className="gap-2" onClick={() => bulkIds.forEach(id => approveMutation.mutate(id))}><Check className="h-4 w-4" /> Approve Selected</Button>
-              <Button size="sm" variant="destructive" className="gap-2" onClick={() => { setRejectOpen(true); }}><X className="h-4 w-4" /> Reject Selected</Button>
+              <Button size="sm" className="gap-2 w-full sm:w-auto" onClick={() => bulkIds.forEach(id => approveMutation.mutate(id))}><Check className="h-4 w-4" /> <span className="hidden sm:inline">Approve Selected</span><span className="sm:hidden">Approve</span></Button>
+              <Button size="sm" variant="destructive" className="gap-2 w-full sm:w-auto" onClick={() => { setRejectOpen(true); }}><X className="h-4 w-4" /> <span className="hidden sm:inline">Reject Selected</span><span className="sm:hidden">Reject</span></Button>
             </>
           )}
         </div>
@@ -206,23 +207,24 @@ export default function AdminApprovals() {
           <TabsTrigger value="rejected">Rejected</TabsTrigger>
         </TabsList>
 
-        <div className="flex items-center gap-2 mb-4">
-          <Input placeholder="Search by product or seller…" value={search} onChange={(e) => setSearch(e.target.value)} className="max-w-sm" />
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="gap-2">Sort <ChevronDown className="h-4 w-4" /></Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start">
-              <DropdownMenuItem onClick={() => setSortKey("date_desc")}>Newest</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setSortKey("date_asc")}>Oldest</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setSortKey("price_asc")}>Price min</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setSortKey("price_desc")}>Price max</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="gap-2"><SlidersHorizontal className="h-4 w-4" /> Filters</Button>
-            </DropdownMenuTrigger>
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 mb-4">
+          <Input placeholder="Search by product or seller…" value={search} onChange={(e) => setSearch(e.target.value)} className="w-full sm:max-w-sm" />
+          <div className="flex gap-2">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="gap-2 w-full sm:w-auto"><ChevronDown className="h-4 w-4" /> <span className="hidden sm:inline">Sort</span></Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start">
+                <DropdownMenuItem onClick={() => setSortKey("date_desc")}>Newest</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setSortKey("date_asc")}>Oldest</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setSortKey("price_asc")}>Price min</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setSortKey("price_desc")}>Price max</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="gap-2 w-full sm:w-auto"><SlidersHorizontal className="h-4 w-4" /> <span className="hidden sm:inline">Filters</span></Button>
+              </DropdownMenuTrigger>
             <DropdownMenuContent className="p-3 space-y-3" align="start">
               <div>
                 <div className="text-xs text-muted-foreground mb-2">Duty</div>
@@ -244,6 +246,7 @@ export default function AdminApprovals() {
               </div>
             </DropdownMenuContent>
           </DropdownMenu>
+          </div>
         </div>
 
         <TabsContent value={statusTab}>
@@ -258,7 +261,7 @@ export default function AdminApprovals() {
 
           {rows.length > 0 && (
             <div className="rounded-xl border bg-card overflow-hidden">
-              <div className="grid grid-cols-[3fr,1fr,1.2fr,2fr,2fr,2fr,1.6fr] gap-4 p-4 border-b bg-muted/40 font-medium text-sm">
+              <div className="hidden md:grid grid-cols-[3fr,1fr,1.2fr,2fr,2fr,2fr,1.6fr] gap-4 p-4 border-b bg-muted/40 font-medium text-sm">
                 <div>Product</div>
                 <div>QTY</div>
                 <div>Price</div>
@@ -283,7 +286,7 @@ export default function AdminApprovals() {
                 return (
                   <div
                     key={r.id}
-                    className="grid grid-cols-[3fr,1fr,1.2fr,2fr,2fr,2fr,1.6fr] gap-4 p-4 border-b last:border-b-0 hover:bg-muted/30 transition-colors cursor-pointer"
+                    className="grid md:grid-cols-[3fr,1fr,1.2fr,2fr,2fr,2fr,1.6fr] grid-cols-1 gap-4 p-4 border-b last:border-b-0 hover:bg-muted/30 transition-colors cursor-pointer"
                     onClick={() => navigate(`/admin/approvals/${r.id}`)}
                   >
                     <div className="flex items-center gap-3 min-w-0">
@@ -300,11 +303,11 @@ export default function AdminApprovals() {
                           <Badge variant="secondary" className="shrink-0">{r.category}</Badge>
                           {wh && <Badge variant="outline" className="shrink-0">{wh.name}</Badge>}
                         </div>
-                        <div className="text-xs text-muted-foreground truncate">{r.subcategory || "—"}</div>
+                        <div className="text-xs text-muted-foreground truncate">{r.subcategory ? toTitleCase(r.subcategory) : "—"}</div>
                       </div>
                     </div>
 
-                    <div className="flex items-center text-sm">{r.quantity}</div>
+                    <div className="hidden md:flex items-center text-sm">{r.quantity}</div>
 
                     <div className="flex flex-col justify-center">
                       <div className="font-semibold">{priceLabel(r)}</div>
@@ -312,9 +315,9 @@ export default function AdminApprovals() {
                       <div className="text-xs text-muted-foreground">{r.duty === "under_bond" ? "Under Bond" : "Duty Paid"}</div>
                     </div>
 
-                    <div className="flex items-center text-sm text-muted-foreground">{desc(r) || "—"}</div>
+                    <div className="hidden md:flex items-center text-sm text-muted-foreground">{desc(r) || "—"}</div>
 
-                    <div className="flex items-center gap-2 min-w-0" onClick={(e) => e.stopPropagation()}>
+                    <div className="hidden md:flex items-center gap-2 min-w-0" onClick={(e) => e.stopPropagation()}>
                       <div className="min-w-0">
                         <div className="truncate text-sm">{r.seller?.full_name ?? "—"}</div>
                         <div className="truncate text-xs text-muted-foreground">{r.seller?.email ?? "—"}</div>
@@ -326,7 +329,7 @@ export default function AdminApprovals() {
                       </div>
                     </div>
 
-                    <div className="flex items-center min-w-0" onClick={(e) => e.stopPropagation()}>
+                    <div className="hidden md:flex items-center min-w-0" onClick={(e) => e.stopPropagation()}>
                       {comp ? (
                         <HoverCard>
                           <HoverCardTrigger asChild>
@@ -344,18 +347,26 @@ export default function AdminApprovals() {
                       )}
                     </div>
 
-                    <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 md:justify-end" onClick={(e) => e.stopPropagation()}>
                       {statusTab === "pending" && (
                         <>
-                          <Button size="sm" className="gap-2" onClick={() => approveMutation.mutate(r.id)}><Check className="h-4 w-4" />Approve</Button>
-                          <Button size="sm" variant="destructive" onClick={() => { setSelected({ [r.id]: true }); setRejectOpen(true); }}>Reject</Button>
+                          <Button size="sm" className="gap-2 w-full sm:w-auto" onClick={() => approveMutation.mutate(r.id)}><Check className="h-4 w-4" />Approve</Button>
+                          <Button size="sm" variant="destructive" className="w-full sm:w-auto" onClick={() => { setSelected({ [r.id]: true }); setRejectOpen(true); }}>Reject</Button>
                         </>
                       )}
-                      <Checkbox checked={!!selected[r.id]} onCheckedChange={(v) => setSelected(p => ({ ...p, [r.id]: !!v }))} />
+                      <div className="flex items-center justify-center sm:justify-start">
+                        <Checkbox checked={!!selected[r.id]} onCheckedChange={(v) => setSelected(p => ({ ...p, [r.id]: !!v }))} />
+                      </div>
+                    </div>
+
+                    {/* Mobile metadata row */}
+                    <div className="flex md:hidden items-center justify-between text-xs text-muted-foreground">
+                      <div>Qty: {r.quantity}</div>
+                      <div>{r.duty === 'under_bond' ? 'Under Bond' : 'Duty Paid'}</div>
                     </div>
 
                     {statusTab !== "pending" && modMap[r.id] && (
-                      <div className="col-span-7 pt-2 text-xs text-muted-foreground">
+                      <div className="md:col-span-7 col-span-1 pt-2 text-xs text-muted-foreground">
                         {modMap[r.id].action === 'approved' ? 'Approved' : 'Rejected'} by {modMap[r.id].admin_name || modMap[r.id].admin_email || 'Admin'} on {new Date(modMap[r.id].created_at).toLocaleString()}
                         {modMap[r.id].reason ? ` • ${modMap[r.id].reason}` : ''}
                       </div>

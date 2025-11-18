@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, useLocation } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 
 // Protected route component - to be rebuilt with new auth flow
 export function Protected({ children }: { children: JSX.Element }) {
   const [allowed, setAllowed] = useState<null | boolean>(null);
   const [loading, setLoading] = useState(true);
+  const location = useLocation();
 
   useEffect(() => {
     (async () => {
@@ -39,8 +40,7 @@ export function Protected({ children }: { children: JSX.Element }) {
   }
 
   if (!allowed) {
-    // Redirect to home for now - will be updated with new auth flow
-    return <Navigate to="/" replace />;
+    return <Navigate to="/login" replace state={{ from: location.pathname }} />;
   }
 
   return children;

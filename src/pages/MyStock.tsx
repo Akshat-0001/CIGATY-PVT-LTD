@@ -7,7 +7,11 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Search, Eye, MoreHorizontal } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { toTitleCase } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
+import SellerReservations from "./seller/Reservations";
+import { ReservationBadge } from "@/components/seller/ReservationBadge";
+import { useReservationCount } from "@/hooks/useReservations";
 
 async function fetchMyListings() {
   const { data: { user } } = await supabase.auth.getUser();
@@ -81,33 +85,39 @@ export default function MyStock() {
   };
 
   return (
-    <div className="container py-8 px-4 space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">My Stock</h1>
-        <Button className="gap-2" onClick={()=>navigate('/add-listing')}>ADD LISTING</Button>
+    <div className="container py-4 md:py-8 px-4 space-y-4 md:space-y-6">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <h1 className="text-2xl sm:text-3xl font-bold">Inventory</h1>
+        <div className="w-full sm:w-auto">
+          <Button className="gap-2 glass-button w-full sm:w-auto" onClick={()=>navigate('/add-listing')}>ADD LISTING</Button>
+        </div>
       </div>
 
-      <Tabs value={tab} onValueChange={setTab} className="w-full">
-        <TabsList className="mb-6">
-          <TabsTrigger value="all">All ({count('all')})</TabsTrigger>
-          <TabsTrigger value="approved">Live ({count('approved')})</TabsTrigger>
-          <TabsTrigger value="pending">Pending ({count('pending')})</TabsTrigger>
-          <TabsTrigger value="idle">Idle ({count('idle')})</TabsTrigger>
-          <TabsTrigger value="rejected">Declined ({count('rejected')})</TabsTrigger>
-          <TabsTrigger value="draft">Draft ({count('draft')})</TabsTrigger>
-        </TabsList>
+      <div>
+        <Tabs value={tab} onValueChange={setTab} className="w-full">
+          <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0 mb-6">
+            <TabsList className="mb-6 glass-nav-item w-max md:w-full">
+              <TabsTrigger value="all" className="whitespace-nowrap">All ({count('all')})</TabsTrigger>
+              <TabsTrigger value="approved" className="whitespace-nowrap">Live ({count('approved')})</TabsTrigger>
+              <TabsTrigger value="pending" className="whitespace-nowrap">Pending ({count('pending')})</TabsTrigger>
+              <TabsTrigger value="idle" className="whitespace-nowrap">Idle ({count('idle')})</TabsTrigger>
+              <TabsTrigger value="rejected" className="whitespace-nowrap">Declined ({count('rejected')})</TabsTrigger>
+              <TabsTrigger value="draft" className="whitespace-nowrap">Draft ({count('draft')})</TabsTrigger>
+              <TabsTrigger value="reservations" className="whitespace-nowrap">Reservations</TabsTrigger>
+            </TabsList>
+          </div>
 
         <TabsContent value={tab} className="space-y-4">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
             <p className="text-sm text-muted-foreground">{filtered.length} items</p>
-            <div className="relative w-96">
+            <div className="relative w-full md:w-96">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input placeholder="Search your listings" className="pl-10" value={query} onChange={(e)=>setQuery(e.target.value)} />
+              <Input placeholder="Search your listings" className="pl-10 glass-input" value={query} onChange={(e)=>setQuery(e.target.value)} />
             </div>
           </div>
 
-          <div className="rounded-lg border bg-card">
-            <div className="grid grid-cols-[1.2fr,2.4fr,1fr,1.2fr,1.2fr,1.2fr,auto] gap-4 p-4 border-b bg-muted/50 font-medium text-sm">
+          <div className="rounded-lg border bg-card glass-card">
+            <div className="hidden md:grid grid-cols-[1.2fr,2.4fr,1fr,1.2fr,1.2fr,1.2fr,auto] gap-4 p-4 border-b bg-muted/50 font-medium text-sm">
               <div>Updated</div>
               <div>Product</div>
               <div>QTY</div>
@@ -117,35 +127,41 @@ export default function MyStock() {
               <div>Actions</div>
             </div>
             {filtered.map((item: any) => (
-              <div key={item.id} className="grid grid-cols-[1.2fr,2.4fr,1fr,1.2fr,1.2fr,1.2fr,auto] gap-4 p-4 border-b last:border-b-0">
-                <div className="text-sm">{new Date(item.updated_at ?? item.created_at).toLocaleString()}</div>
+                <div
+                  key={item.id}
+                  className="grid md:grid-cols-[1.2fr,2.4fr,1fr,1.2fr,1.2fr,1.2fr,auto] grid-cols-1 gap-4 p-4 border-b last:border-b-0 hover:bg-muted/30 transition-colors"
+                >
+                <div className="hidden md:block text-sm">{new Date(item.updated_at ?? item.created_at).toLocaleString()}</div>
                 <div className="flex items-center gap-3 min-w-0">
                   <div className="h-12 w-12 rounded-md overflow-hidden bg-muted border flex items-center justify-center shrink-0">
                     {Array.isArray(item.image_urls) && item.image_urls[0] ? (
-                      <img src={item.image_urls[0]} alt={item.product_name} className="h-full w-full object-cover" />
+                      <img src={item.image_urls[0]} alt={item.product_name} className="h-full w-full object-cover" loading="lazy" decoding="async" />
                     ) : (
                       <span className="text-xs text-muted-foreground">IMG</span>
                     )}
                   </div>
                   <div className="min-w-0">
                     <div className="truncate font-medium text-sm">{item.product_name || '—'}</div>
-                    <div className="text-xs text-muted-foreground truncate">{item.category}{item.subcategory? ` • ${item.subcategory}`:''} • {item.packaging}{item.bottles_per_case? ` • ${item.bottles_per_case} btl/case`:''}</div>
+                    <div className="text-xs text-muted-foreground truncate">{toTitleCase(item.category)}{item.subcategory? ` • ${toTitleCase(item.subcategory)}`:''} • {item.packaging}{item.bottles_per_case? ` • ${item.bottles_per_case} btl/case`:''}</div>
                     <div className="text-xs text-muted-foreground truncate">{item.incoterm || '—'}{item.lead_time? ` • ${item.lead_time}`:''}</div>
                   </div>
                 </div>
-                <div className="text-sm">{item.quantity ?? item.qty_cases ?? '-'}</div>
-                <div className="text-sm">{priceLabel(item)}</div>
-                <div className="text-sm">{item.duty === 'under_bond' ? 'Under Bond' : 'Duty Paid'}</div>
-                <div className="text-sm">
-                  <Badge variant={item.ui_status==='draft' ? 'outline' : (item.status==='approved'?'secondary': item.status==='rejected'?'destructive':'outline')}>
-                    {item.ui_status === 'draft' ? 'draft' : (item.status || 'pending')}
-                  </Badge>
-                </div>
-                <div className="flex gap-2 items-center">
-                  <Button size="sm" variant="outline" onClick={()=> navigate(`/product/${item.id}`)}><Eye className="h-4 w-4"/> View</Button>
+                    <div className="hidden md:block text-sm">{item.quantity ?? item.qty_cases ?? '-'}</div>
+                    <div className="text-sm md:text-left text-right">{priceLabel(item)}</div>
+                    <div className="hidden md:block text-sm">{item.duty === 'under_bond' ? 'Under Bond' : 'Duty Paid'}</div>
+                    <div className="text-sm flex flex-col gap-1 md:items-start items-end">
+                      <Badge variant={item.ui_status==='draft' ? 'outline' : (item.status==='approved'?'secondary': item.status==='rejected'?'destructive':'outline')}>
+                        {item.ui_status === 'draft' ? 'draft' : (item.status || 'pending')}
+                      </Badge>
+                      {(item.status === 'approved' && item.ui_status === 'live') && (
+                        <ReservationBadge listingId={item.id} />
+                      )}
+                    </div>
+                <div className="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center md:justify-start justify-end">
+                  <Button size="sm" variant="outline" className="w-full sm:w-auto" onClick={()=> navigate(`/product/${item.id}`)}><Eye className="h-4 w-4"/> <span className="hidden sm:inline">View</span></Button>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button size="sm" variant="ghost"><MoreHorizontal className="h-4 w-4"/></Button>
+                      <Button size="sm" variant="ghost" className="w-full sm:w-auto"><MoreHorizontal className="h-4 w-4"/></Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                       <DropdownMenuItem onClick={()=> navigate(`/add-listing?id=${item.id}`)}>Edit</DropdownMenuItem>
@@ -161,11 +177,22 @@ export default function MyStock() {
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>
+                {/* Mobile-only compact meta row */}
+                <div className="flex md:hidden items-center justify-between text-xs text-muted-foreground">
+                  <div>{new Date(item.updated_at ?? item.created_at).toLocaleDateString()}</div>
+                  <div>Qty: {item.quantity ?? item.qty_cases ?? '-'}</div>
+                  <div>{item.duty === 'under_bond' ? 'Under Bond' : 'Duty Paid'}</div>
+                </div>
               </div>
             ))}
           </div>
         </TabsContent>
+
+        <TabsContent value="reservations">
+          <SellerReservations />
+        </TabsContent>
       </Tabs>
+      </div>
     </div>
   );
 }

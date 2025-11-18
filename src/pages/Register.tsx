@@ -355,11 +355,7 @@ const Register = () => {
   ];
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-dark py-12 px-4 sm:px-6 lg:px-8">
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?q=80&w=2070')] bg-cover bg-center opacity-10" />
-        <div className="absolute inset-0 hero-gradient" />
-      </div>
+    <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -381,13 +377,13 @@ const Register = () => {
               />
             </motion.div>
             <div>
-              <h2 className="text-3xl font-bold text-light">CIGATY</h2>
-              <p className="text-xs text-gold">India’s First B2B Liquor Exchange</p>
+              <h2 className="text-3xl font-bold" style={{ color: '#D4AF37' }}>CIGATY</h2>
+              <p className="text-xs text-muted-foreground">India's First B2B Liquor Exchange</p>
             </div>
           </Link>
           
-          <h1 className="text-3xl font-bold text-light">Create Your Account</h1>
-          <p className="mt-2 text-gray-400">
+          <h1 className="text-3xl font-bold text-foreground">Create Your Account</h1>
+          <p className="mt-2 text-muted-foreground">
             Join the world's leading B2B drinks marketplace
           </p>
         </div>
@@ -402,10 +398,10 @@ const Register = () => {
                     initial={false}
                     animate={{
                       scale: currentStep === step.number ? 1.1 : 1,
-                      backgroundColor: currentStep >= step.number ? '#D4AF37' : '#2a2a2a',
+                      backgroundColor: currentStep >= step.number ? '#D4AF37' : 'hsl(var(--muted))',
                     }}
                     className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${
-                      currentStep >= step.number ? 'text-dark' : 'text-gray-400'
+                      currentStep >= step.number ? 'text-foreground' : 'text-muted-foreground'
                     }`}
                   >
                     {currentStep > step.number ? (
@@ -415,15 +411,20 @@ const Register = () => {
                     )}
                   </motion.div>
                   <span className={`text-xs mt-2 ${
-                    currentStep >= step.number ? 'text-gold' : 'text-gray-400'
-                  }`}>
+                    currentStep >= step.number ? 'text-foreground' : 'text-muted-foreground'
+                  }`}
+                  style={currentStep >= step.number ? { color: '#D4AF37' } : {}}
+                  >
                     {step.title}
                   </span>
                 </div>
                 {index < steps.length - 1 && (
-                  <div className={`w-16 h-0.5 mx-2 ${
-                    currentStep > step.number ? 'bg-gold' : 'bg-dark-light'
-                  }`} />
+                  <div 
+                    className={`w-16 h-0.5 mx-2 ${
+                      currentStep > step.number ? '' : 'bg-muted'
+                    }`}
+                    style={currentStep > step.number ? { backgroundColor: '#D4AF37' } : {}}
+                  />
                 )}
               </div>
             ))}
@@ -435,7 +436,7 @@ const Register = () => {
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.2, duration: 0.4 }}
-          className="card bg-dark-lighter/80 backdrop-blur-lg"
+          className="card bg-card/95 backdrop-blur-lg border-2 border-primary/20 hover:border-primary/40 transition-all"
         >
           {generalError && (
             <motion.div
@@ -444,7 +445,7 @@ const Register = () => {
               className="mb-6 p-4 bg-wine/20 border border-wine rounded-lg flex items-start"
             >
               <AlertCircle className="w-5 h-5 text-wine mr-3 flex-shrink-0 mt-0.5" />
-              <p className="text-sm text-light">{generalError}</p>
+              <p className="text-sm text-foreground">{generalError}</p>
             </motion.div>
           )}
 
@@ -535,14 +536,14 @@ const Register = () => {
                 </div>
 
                 <div>
-                  <label className="block text-light font-medium mb-2">
-                    Preferred Contact Method <span className="text-wine">*</span>
+                  <label className="block text-foreground font-medium mb-2">
+                    Preferred Contact Method <span className="text-destructive">*</span>
                   </label>
                   <select
                     name="preferredContact"
                     value={accountData.preferredContact}
                     onChange={handleAccountChange}
-                    className="input-field"
+                    className="w-full px-4 py-2 bg-background border border-input rounded-md text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                   >
                     <option value="Primary Phone">Primary Phone</option>
                     <option value="Email">Email</option>
@@ -646,14 +647,14 @@ const Register = () => {
                     icon={<MapPin size={20} />}
                   />
                   <div>
-                    <label className="block text-light font-medium mb-2">
-                      Country <span className="text-wine">*</span>
+                    <label className="block text-foreground font-medium mb-2">
+                      Country <span className="text-destructive">*</span>
                     </label>
                     <select
                       name="country"
                       value={companyData.country}
                       onChange={handleCompanyChange}
-                      className="input-field"
+                      className="w-full px-4 py-2 bg-background border border-input rounded-md text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                     >
                       <option value="">Select Country</option>
                       {countries.map(country => (
@@ -661,7 +662,7 @@ const Register = () => {
                       ))}
                     </select>
                     {errors.country && (
-                      <p className="text-wine text-sm mt-1">{errors.country}</p>
+                      <p className="text-destructive text-sm mt-1">{errors.country}</p>
                     )}
                   </div>
                 </div>
@@ -712,8 +713,8 @@ const Register = () => {
                 className="space-y-6"
               >
                 <div>
-                  <h3 className="text-xl font-semibold text-light mb-2">Upload Required Documents</h3>
-                  <p className="text-gray-400 mb-6">
+                  <h3 className="text-xl font-semibold text-foreground mb-2">Upload Required Documents</h3>
+                  <p className="text-muted-foreground mb-6">
                     Please upload clear copies of the following documents. Supported formats: PDF, PNG, JPG (Max 10MB per file)
                   </p>
 
@@ -794,11 +795,12 @@ const Register = () => {
         </motion.div>
 
         {/* Login Link */}
-        <p className="text-center text-gray-400">
+        <p className="text-center text-muted-foreground">
           Already have an account?{' '}
           <Link
             to="/login"
-            className="text-gold hover:text-gold-light font-semibold transition-colors"
+            className="font-semibold transition-colors"
+            style={{ color: '#D4AF37' }}
           >
             Sign in here
           </Link>
@@ -835,8 +837,8 @@ const DocumentUploadField = ({ label, required, file, error, onSelect, onRemove 
 
   return (
     <div className="mb-6">
-      <label className="block text-light font-medium mb-2">
-        {label} {required && <span className="text-wine">*</span>}
+      <label className="block text-foreground font-medium mb-2">
+        {label} {required && <span className="text-destructive">*</span>}
       </label>
 
       {!file ? (
@@ -844,30 +846,31 @@ const DocumentUploadField = ({ label, required, file, error, onSelect, onRemove 
           {...getRootProps()}
           className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-all ${
             isDragActive
-              ? 'border-gold bg-gold/10'
+              ? 'bg-primary/10'
               : error
-              ? 'border-wine bg-wine/10'
-              : 'border-dark-light hover:border-gold/50'
+              ? 'border-destructive bg-destructive/10'
+              : 'border-border hover:border-primary/50'
           }`}
+          style={isDragActive ? { borderColor: '#D4AF37' } : error ? {} : {}}
         >
           <input {...getInputProps()} />
-          <Upload className="w-8 h-8 text-gold mx-auto mb-2" />
+          <Upload className="w-8 h-8 mx-auto mb-2" style={{ color: '#D4AF37' }} />
           {isDragActive ? (
-            <p className="text-light">Drop the file here...</p>
+            <p className="text-foreground">Drop the file here...</p>
           ) : (
             <>
-              <p className="text-light text-sm mb-1">Drag & drop or click to select</p>
-              <p className="text-xs text-gray-400">PDF, PNG, JPG up to 10MB</p>
+              <p className="text-foreground text-sm mb-1">Drag & drop or click to select</p>
+              <p className="text-xs text-muted-foreground">PDF, PNG, JPG up to 10MB</p>
             </>
           )}
         </div>
       ) : (
-        <div className="flex items-center justify-between p-4 bg-dark rounded-lg border border-dark-light">
+        <div className="flex items-center justify-between p-4 bg-muted rounded-lg border border-border">
           <div className="flex items-center space-x-3">
-            <FileText className="w-6 h-6 text-gold" />
+            <FileText className="w-6 h-6" style={{ color: '#D4AF37' }} />
             <div>
-              <p className="text-light font-medium text-sm">{file.name}</p>
-              <p className="text-xs text-gray-400">
+              <p className="text-foreground font-medium text-sm">{file.name}</p>
+              <p className="text-xs text-muted-foreground">
                 {(file.size / 1024 / 1024).toFixed(2)} MB
               </p>
             </div>

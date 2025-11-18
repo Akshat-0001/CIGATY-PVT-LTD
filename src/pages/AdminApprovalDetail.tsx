@@ -1,6 +1,7 @@
 import { useParams, Link } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { toTitleCase } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -94,7 +95,7 @@ export default function AdminApprovalDetail() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-display font-semibold">{listing.product_name}</h1>
-          <div className="text-sm text-muted-foreground">{listing.category}{listing.subcategory ? ` • ${listing.subcategory}` : ""}</div>
+          <div className="text-sm text-muted-foreground">{toTitleCase(listing.category)}{listing.subcategory ? ` • ${toTitleCase(listing.subcategory)}` : ""}</div>
         </div>
         <div className="flex gap-2">
           {listing.status === "pending" && (

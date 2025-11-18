@@ -9,6 +9,13 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter, SheetTrigger } from "@/components/ui/sheet";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Download, LayoutList, LayoutGrid, ChevronDown, SlidersHorizontal } from "lucide-react";
+import { toTitleCase } from "@/lib/utils";
+import MarketplaceCard from "@/components/marketplace/MarketplaceCard";
+import { motion, AnimatePresence } from "framer-motion";
+import { staggerContainer, fadeInUp, hoverScale, tapScale, springTransition } from "@/lib/animations";
+const THIRTY_DAYS_MS = 30 * 24 * 60 * 60 * 1000;
+const isNew = (createdAt?: string | null) =>
+  !!createdAt && (Date.now() - new Date(createdAt).getTime() < THIRTY_DAYS_MS);
 
 const SUBCATEGORIES: Record<string, string[]> = {
   Beer: ['craft','low/no alcohol'],
@@ -104,17 +111,32 @@ export default function LiveOffers() {
   };
 
   const CategoryTabs = () => (
-    <div className="flex items-center gap-3 flex-wrap">
-      {['All','Beer','Wine','Spirits','Champagne','Other'].map(cat => (
-        <div key={cat} className="relative group">
-          <Button
-            size="sm"
-            variant={activeCategory === cat ? 'secondary' : 'ghost'}
-            onClick={() => { setActiveCategory(cat); setActiveSubcategory(''); }}
-            className="rounded-full px-4"
+    <motion.div
+      className="flex items-center gap-3 flex-wrap"
+      initial="hidden"
+      animate="visible"
+      variants={staggerContainer}
+    >
+      {['All','Beer','Wine','Spirits','Champagne','Other'].map((cat, index) => (
+        <motion.div
+          key={cat}
+          variants={fadeInUp}
+          className="relative group"
+        >
+          <motion.div
+            whileHover={hoverScale}
+            whileTap={tapScale}
+            transition={springTransition}
           >
-            {cat}
-          </Button>
+            <Button
+              size="sm"
+              variant={activeCategory === cat ? 'secondary' : 'ghost'}
+              onClick={() => { setActiveCategory(cat); setActiveSubcategory(''); }}
+              className="rounded-full px-4 glass-nav-item"
+            >
+              {cat}
+            </Button>
+          </motion.div>
           {cat !== 'All' && (SUBCATEGORIES[cat] || []).length > 0 && (
             <div className="absolute left-0 top-full mt-2 z-20 hidden group-hover:block">
               <div className="w-64 rounded-xl border bg-card shadow-xl p-3">
@@ -126,25 +148,39 @@ export default function LiveOffers() {
                       onClick={() => { setActiveCategory(cat); setActiveSubcategory(sc); }}
                       className={`text-left px-2 py-1 rounded-md hover:bg-muted ${activeSubcategory === sc && activeCategory === cat ? 'bg-muted' : ''}`}
                     >
-                      {sc}
+                      {toTitleCase(sc)}
                     </button>
                   ))}
                 </div>
               </div>
             </div>
           )}
-        </div>
+        </motion.div>
       ))}
-    </div>
+    </motion.div>
   );
 
-  const ListRow = ({ row }: { row: any }) => (
-    <Link
-      to={`/product/${row.id}`}
-      className="grid grid-cols-[3fr,1fr,1fr,2fr,2fr] gap-4 p-4 border-b last:border-b-0 hover:bg-muted/40 transition-colors"
+  const ListRow = ({ row, index }: { row: any; index: number }) => (
+    <motion.div
+      initial="hidden"
+      animate="visible"
+      variants={fadeInUp}
+      transition={{ delay: index * 0.05, ...springTransition }}
     >
+      <Link
+        to={`/product/${row.id}`}
+        className="group relative grid grid-cols-[1fr,auto] md:grid-cols-[3fr,1fr,1fr,2fr,2fr] gap-4 p-4 rounded-2xl border bg-card glass-card shadow-sm transition-all duration-300 hover:shadow-xl hover:shadow-primary/10"
+      >
+      {/* Half-outside NEW badge at top-left (only for <30 days) */}
+      {isNew(row.created_at) && (
+        <div className="pointer-events-none absolute -top-2 -left-2 z-20">
+          <span className="inline-flex items-center h-5 px-2 rounded-full bg-primary text-primary-foreground text-[10px] font-semibold shadow-md">New</span>
+        </div>
+      )}
+      <div className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100"
+           style={{ background: "radial-gradient(1200px 200px at top, rgba(59,130,246,0.10), transparent 50%)" }} />
       <div className="flex items-center gap-4">
-        <div className="h-16 w-16 rounded-lg overflow-hidden bg-muted border flex items-center justify-center">
+        <div className="h-20 w-20 rounded-lg overflow-hidden bg-muted border flex items-center justify-center ring-1 ring-transparent group-hover:ring-primary/20 transition">
           {Array.isArray(row.image_urls) && row.image_urls.length > 0 ? (
             <img src={row.image_urls[0]} alt={row.product_name} className="h-full w-full object-cover" />
           ) : (
@@ -152,70 +188,48 @@ export default function LiveOffers() {
           )}
         </div>
         <div className="min-w-0">
-          <Badge className="mb-1 bg-primary text-primary-foreground">New in</Badge>
-          <h3 className="truncate font-medium text-sm text-primary">{row.product_name}</h3>
+          <h3 className="truncate font-medium text-sm text-black">{row.product_name}</h3>
         </div>
       </div>
 
-      <div className="flex items-center text-sm">{row.quantity}</div>
+      <div className="hidden md:flex items-center text-sm">{row.quantity}</div>
 
-      <div className="flex flex-col justify-center">
+      <div className="flex flex-col justify-center items-end md:items-start">
         <p className="font-semibold">{priceLabel(row)}</p>
         <p className="text-xs text-muted-foreground">Per Case</p>
         <p className="text-xs text-muted-foreground">{row.duty === "under_bond" ? "Under Bond" : "Duty Paid"}</p>
       </div>
 
-      <div className="flex items-center text-sm text-muted-foreground">{descr(row) || '—'}</div>
+      <div className="hidden md:flex items-center text-sm text-muted-foreground">{descr(row) || '—'}</div>
 
-      <div className="flex items-center text-sm text-muted-foreground">
+      <div className="hidden md:flex items-center text-sm text-muted-foreground">
         {row.restricted ? row.restricted : 'No'}
       </div>
     </Link>
+    </motion.div>
   );
 
-  const GridCard = ({ row }: { row: any }) => (
-    <Link to={`/product/${row.id}`} className="group rounded-xl border bg-card overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-      <div className="aspect-[4/3] bg-muted overflow-hidden">
-        {Array.isArray(row.image_urls) && row.image_urls.length > 0 ? (
-          <img src={row.image_urls[0]} alt={row.product_name} className="h-full w-full object-cover group-hover:scale-[1.02] transition-transform" />
-        ) : (
-          <div className="h-full w-full flex items-center justify-center text-muted-foreground">IMG</div>
-        )}
-      </div>
-      <div className="p-4 space-y-2">
-        <div className="flex items-center justify-between">
-          <h3 className="font-medium truncate">{row.product_name}</h3>
-          <Badge variant="secondary" className="ml-2">{row.category}</Badge>
-        </div>
-        <div className="text-sm text-muted-foreground truncate">{descr(row)}</div>
-        <div className="flex items-baseline gap-2">
-          <div className="text-lg font-semibold">{priceLabel(row)}</div>
-          <div className="text-xs text-muted-foreground">per case</div>
-        </div>
-        <div className="flex items-center gap-2">
-          <Badge className={row.duty === 'under_bond' ? 'bg-amber-500 text-white' : 'bg-emerald-600 text-white'}>
-            {row.duty === 'under_bond' ? 'Under Bond' : 'Duty Paid'}
-          </Badge>
-          <Badge variant="outline">QTY {row.quantity}</Badge>
-          <Badge variant="outline">{row.restricted ? 'Restricted' : 'No Restrictions'}</Badge>
-        </div>
-      </div>
-    </Link>
-  );
+  // Grid uses MarketplaceCard
 
   const content = useMemo(() => {
     if (isLoading) {
       return (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="rounded-xl border bg-card overflow-hidden">
-              <div className="animate-pulse h-44 bg-muted" />
-              <div className="p-4 space-y-2">
-                <div className="h-4 bg-muted rounded w-2/3" />
-                <div className="h-3 bg-muted rounded w-1/3" />
-                <div className="h-3 bg-muted rounded w-1/2" />
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.1 }}
+              className="rounded-2xl border bg-card overflow-hidden glass-card"
+            >
+              <div className="shimmer-loading h-44 bg-muted" />
+              <div className="p-4 space-y-3">
+                <div className="h-4 bg-muted rounded w-2/3 shimmer-loading" />
+                <div className="h-3 bg-muted rounded w-1/2 shimmer-loading" />
+                <div className="h-3 bg-muted rounded w-1/3 shimmer-loading" />
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
       );
@@ -223,7 +237,7 @@ export default function LiveOffers() {
     if (error) {
       return (
         <div className="p-6 text-center">
-          <p className="text-sm text-red-500 mb-2">Failed to load live offers</p>
+          <p className="text-sm text-red-500 mb-2">Failed to load marketplace</p>
           <p className="text-xs text-muted-foreground">{error instanceof Error ? error.message : "Unknown error"}</p>
         </div>
       );
@@ -231,46 +245,67 @@ export default function LiveOffers() {
     if (items.length === 0) {
       return (
         <div className="p-6 text-center">
-          <p className="text-sm text-muted-foreground">No live offers available yet.</p>
+          <p className="text-sm text-muted-foreground">No products available in marketplace yet.</p>
         </div>
       );
     }
 
     if (viewMode === "grid") {
       return (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {items.map((row) => (
-            <GridCard key={row.id} row={row} />
+        <motion.div
+          variants={staggerContainer}
+          initial="hidden"
+          animate="visible"
+          className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+        >
+          {items.map((row, index) => (
+            <motion.div key={row.id} variants={fadeInUp}>
+              <MarketplaceCard row={row} priceLabel={priceLabel} descr={descr} />
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       );
     }
 
     return (
-      <div className="rounded-xl border bg-card overflow-hidden">
-        <div className="grid grid-cols-[3fr,1fr,1fr,2fr,2fr] gap-4 p-4 border-b bg-muted/40 font-medium text-sm">
+      <motion.div
+        variants={staggerContainer}
+        initial="hidden"
+        animate="visible"
+        className="space-y-3"
+      >
+        <div className="hidden md:grid grid-cols-[3fr,1fr,1fr,2fr,2fr] gap-4 px-2 font-medium text-xs text-muted-foreground">
           <div>Product</div>
           <div>QTY</div>
           <div>Price</div>
           <div>Description</div>
           <div>Market Restrictions</div>
         </div>
-        {items.map((row) => (
-          <ListRow key={row.id} row={row} />
-        ))}
-      </div>
+        <div className="grid gap-3">
+          <AnimatePresence mode="popLayout">
+            {items.map((row, index) => (
+              <ListRow key={row.id} row={row} index={index} />
+            ))}
+          </AnimatePresence>
+        </div>
+      </motion.div>
     );
   }, [isLoading, error, items, viewMode]);
 
+  const appliedFiltersCount =
+    Object.values(filterCategories).filter(Boolean).length +
+    Object.values(filterContents).filter(Boolean).length +
+    Object.values(filterWarehouses).filter(Boolean).length;
+
   return (
-    <div className="container py-8 px-4 space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-display font-semibold">Live Offers</h1>
-        <div className="flex items-center gap-2">
+    <div className="container py-4 md:py-8 px-4 space-y-4 md:space-y-6">
+      <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+        <h1 className="text-2xl md:text-3xl font-display font-semibold">Marketplace</h1>
+        <div className="flex flex-wrap items-center gap-2">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="gap-2">
-                Sort by <ChevronDown className="h-4 w-4" />
+              <Button variant="outline" size="sm" className="gap-2">
+                <ChevronDown className="h-4 w-4" /> <span className="hidden sm:inline">Sort by</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
@@ -285,11 +320,14 @@ export default function LiveOffers() {
 
           <Sheet open={showFilters} onOpenChange={setShowFilters}>
             <SheetTrigger asChild>
-              <Button variant="outline" className="gap-2">
-                <SlidersHorizontal className="h-4 w-4" /> Filter by
+              <Button variant="outline" size="sm" className="gap-2">
+                <SlidersHorizontal className="h-4 w-4" /> <span className="hidden sm:inline">Filter by</span>
+                {appliedFiltersCount > 0 && (
+                  <Badge className="ml-1 bg-primary/15 text-primary border-primary/30 text-xs">{appliedFiltersCount}</Badge>
+                )}
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="w-[360px] sm:w-[420px]">
+            <SheetContent side="right" className="w-[360px] sm:w-[420px] glass-light">
               <SheetHeader>
                 <SheetTitle>Filters</SheetTitle>
               </SheetHeader>
@@ -348,19 +386,34 @@ export default function LiveOffers() {
             </SheetContent>
           </Sheet>
 
-          <Button variant="outline" className="gap-2">
-            <Download className="h-4 w-4" />
-            DOWNLOAD LIVE OFFERS
+          <Button variant="outline" size="sm" className="gap-2 hidden sm:flex">
+            <Download className="h-4 w-4" /> <span className="hidden md:inline">DOWNLOAD MARKETPLACE</span>
           </Button>
 
-          <div className="flex gap-1 border rounded-md p-1">
-            <Button variant={viewMode === "list" ? "secondary" : "ghost"} size="sm" onClick={() => setViewMode("list")}>
-              <LayoutList className="h-4 w-4" />
-            </Button>
-            <Button variant={viewMode === "grid" ? "secondary" : "ghost"} size="sm" onClick={() => setViewMode("grid")}>
-              <LayoutGrid className="h-4 w-4" />
-            </Button>
-          </div>
+          <motion.div
+            className="flex gap-1 border rounded-md p-1 glass-nav-item"
+            whileHover={{ scale: 1.02 }}
+            transition={springTransition}
+          >
+            <motion.div
+              whileHover={hoverScale}
+              whileTap={tapScale}
+              transition={springTransition}
+            >
+              <Button variant={viewMode === "list" ? "secondary" : "ghost"} size="sm" onClick={() => setViewMode("list")}>
+                <LayoutList className="h-4 w-4" />
+              </Button>
+            </motion.div>
+            <motion.div
+              whileHover={hoverScale}
+              whileTap={tapScale}
+              transition={springTransition}
+            >
+              <Button variant={viewMode === "grid" ? "secondary" : "ghost"} size="sm" onClick={() => setViewMode("grid")}>
+                <LayoutGrid className="h-4 w-4" />
+              </Button>
+            </motion.div>
+          </motion.div>
         </div>
       </div>
 

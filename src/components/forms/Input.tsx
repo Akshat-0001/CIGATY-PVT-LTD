@@ -13,9 +13,9 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
     return (
       <div className="w-full">
         {label && (
-          <label className="block text-light font-medium mb-2">
+          <label className="block text-foreground font-medium mb-2">
             {label}
-            {props.required && <span className="text-wine ml-1">*</span>}
+            {props.required && <span className="text-destructive ml-1">*</span>}
           </label>
         )}
         
@@ -28,8 +28,8 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
           
           <input
             ref={ref}
-            className={`input-field ${icon ? 'pl-12' : ''} ${
-              error ? 'border-wine focus:border-wine focus:ring-wine/20' : ''
+            className={`flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 ${icon ? 'pl-12' : ''} ${
+              error ? 'border-destructive focus-visible:ring-destructive/40' : ''
             } ${className}`}
             {...props}
           />
@@ -39,14 +39,14 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
           <motion.p
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-wine text-sm mt-1"
+            className="text-destructive text-sm mt-1"
           >
             {error}
           </motion.p>
         )}
         
         {helperText && !error && (
-          <p className="text-gray-400 text-sm mt-1">{helperText}</p>
+          <p className="text-muted-foreground text-sm mt-1">{helperText}</p>
         )}
       </div>
     );
