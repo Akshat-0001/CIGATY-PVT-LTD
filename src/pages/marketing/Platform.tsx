@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom';
-
 import {
   Package,
   TrendingUp,
@@ -148,12 +147,7 @@ const Platform = () => {
         </div>
 
         <div className="container mx-auto px-4 relative z-10">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="max-w-4xl mx-auto text-center"
-          >
+          <div className="max-w-4xl mx-auto text-center">
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-4 md:mb-6 px-2">
               The Most <span className="text-gradient-primary">Powerful</span>
               <br />Platform for Drinks Trade
@@ -169,7 +163,7 @@ const Platform = () => {
                 <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" size={20} />
               </Button>
             </Link>
-          </motion.div>
+          </div>
         </div>
       </section>
 
@@ -179,19 +173,14 @@ const Platform = () => {
       {/* Main Features */}
       <section className="py-12 md:py-20 lg:py-24 bg-gradient-to-b from-muted/20 to-background">
         <div className="container mx-auto px-4">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: false, amount: 0.3 }}
-            className="text-center mb-8 md:mb-12 lg:mb-16"
-          >
+          <div className="text-center mb-8 md:mb-12 lg:mb-16">
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground mb-3 md:mb-4">
               Core <span className="text-gradient-primary">Features</span>
             </h2>
             <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto px-2">
               Designed specifically for the global drinks industry
             </p>
-          </motion.div>
+          </div>
 
           <div className="space-y-24">
             {mainFeatures.map((feature, index) => {
@@ -199,51 +188,37 @@ const Platform = () => {
               const isEven = index % 2 === 0;
 
               return (
-                <motion.div
+                <div
                   key={feature.title}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: false, amount: 0.2 }}
-                  transition={{ delay: 0.2, duration: 0.6 }}
-                  className={`grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12 items-center ${
-                    isEven ? '' : 'lg:grid-flow-dense'
-                  }`}
+                  className={`flex flex-col ${isEven ? 'lg:flex-row' : 'lg:flex-row-reverse'} gap-8 lg:gap-12 items-center`}
                 >
-                  <div className={isEven ? '' : 'lg:col-start-2'}>
-                    <div className="flex flex-col sm:flex-row items-start sm:items-center mb-4 gap-3">
-                      <div className="w-12 h-12 md:w-16 md:h-16 rounded-lg bg-gradient-to-br from-primary to-secondary flex items-center justify-center sm:mr-4">
-                        <Icon className="w-6 h-6 md:w-8 md:h-8 text-primary-foreground" />
-                      </div>
-                      <h3 className="text-2xl sm:text-3xl font-bold text-foreground">{feature.title}</h3>
+                  {/* Icon & Title */}
+                  <div className="flex-1 text-center lg:text-left">
+                    <div className={`inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br ${feature.color} mb-6 shadow-lg`}>
+                      <Icon className="w-10 h-10 text-white" strokeWidth={2} />
                     </div>
-                    <p className="text-base md:text-lg lg:text-xl text-muted-foreground mb-4 md:mb-6">{feature.description}</p>
-                    <ul className="space-y-3">
-                      {feature.features.map((item) => (
-                        <li key={item} className="flex items-start">
-                          <CheckCircle2 className="w-6 h-6 text-primary mr-3 flex-shrink-0 mt-0.5" />
-                          <span className="text-foreground">{item}</span>
-                        </li>
-                      ))}
-                    </ul>
+                    <h3 className="text-2xl md:text-3xl font-bold text-foreground mb-4">
+                      {feature.title}
+                    </h3>
+                    <p className="text-base md:text-lg text-muted-foreground mb-6">
+                      {feature.description}
+                    </p>
                   </div>
 
-                  <div className={isEven ? '' : 'lg:col-start-1 lg:row-start-1'}>
-                    <div className="rounded-2xl overflow-hidden shadow-luxury border border-primary/20 bg-gradient-to-br from-card to-muted">
-                      <div className="aspect-video flex items-center justify-center p-12">
-                        <div className="text-center">
-                          <div className={`w-32 h-32 mx-auto mb-6 rounded-2xl bg-gradient-to-br ${feature.color} flex items-center justify-center shadow-2xl`}>
-                            <Icon className="w-16 h-16 text-white" strokeWidth={2} />
-                          </div>
-                          <p className="text-2xl font-bold text-foreground mb-2">{feature.title}</p>
-                          <p className="text-muted-foreground max-w-md mx-auto">Feature Preview</p>
-                          <div className="mt-6 inline-block px-4 py-2 bg-card border border-primary/30 rounded-lg">
-                            <span className="text-primary text-sm font-semibold">Coming Soon</span>
-                          </div>
-                        </div>
-                      </div>
+                  {/* Features List */}
+                  <div className="flex-1">
+                    <div className="glass-effect rounded-2xl p-6 md:p-8 border border-primary/20">
+                      <ul className="space-y-4">
+                        {feature.features.map((item, idx) => (
+                          <li key={idx} className="flex items-start gap-3">
+                            <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                            <span className="text-sm md:text-base text-foreground">{item}</span>
+                          </li>
+                        ))}
+                      </ul>
                     </div>
                   </div>
-                </motion.div>
+                </div>
               );
             })}
           </div>
@@ -253,161 +228,46 @@ const Platform = () => {
       {/* Section Divider */}
       <div className="section-divider my-8" />
 
-      {/* Additional Features Grid */}
-      <section className="py-12 md:py-20 lg:py-24 bg-gradient-to-b from-background to-muted/30 relative overflow-hidden">
-        {/* Background decoration */}
-        <div className="absolute inset-0 opacity-5">
-          <div className="absolute top-20 right-10 w-96 h-96 bg-primary/20 rounded-full blur-3xl" />
-          <div className="absolute bottom-20 left-10 w-96 h-96 bg-secondary/20 rounded-full blur-3xl" />
-        </div>
+      {/* Additional Features */}
+      <section className="py-12 md:py-20 lg:py-24 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-background" />
 
         <div className="container mx-auto px-4 relative z-10">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: false, amount: 0.3 }}
-            className="text-center mb-8 md:mb-12 lg:mb-16"
-          >
+          <div className="text-center mb-8 md:mb-12">
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground mb-3 md:mb-4">
-              And Much <span className="text-gradient-primary">More</span>
+              More <span className="text-gradient-primary">Features</span>
             </h2>
             <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto px-2">
               Additional features to streamline your operations
             </p>
-          </motion.div>
+          </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-            {additionalFeatures.map((feature, index) => {
+            {additionalFeatures.map((feature) => {
               const Icon = feature.icon;
-              const gradients = [
-                'from-primary to-primary/70',
-                'from-secondary to-secondary/70',
-                'from-primary to-primary/70',
-                'from-secondary to-secondary/70',
-                'from-primary to-primary/70',
-                'from-secondary to-secondary/70',
-              ];
-              const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
               
               return (
-                <motion.div
+                <div
                   key={feature.title}
-                  initial={{ opacity: 0, y: isMobile ? 0 : 30 }}
-                  whileInView={isMobile ? {} : { opacity: 1, y: 0 }}
-                  viewport={{ once: true, amount: 0.2 }}
-                  transition={isMobile ? {} : { delay: index * 0.03, duration: 0.3 }}
-                  whileHover={isMobile ? {} : { y: -8, scale: 1.01, transition: { duration: 0.2 } }}
                   className="group relative"
                 >
-                  {/* Glow effect on hover */}
-                  <div className={`absolute -inset-0.5 bg-gradient-to-r ${gradients[index]} rounded-2xl blur opacity-0 group-hover:opacity-60 transition duration-500`} />
-                  
-                  <div 
-                    className="relative border-2 border-primary/40 rounded-2xl p-6 md:p-8 h-full hover:border-primary/70 transition-all duration-300 overflow-hidden shadow-lg hover:shadow-xl"
-                    style={{ 
-                      background: 'linear-gradient(to bottom right, hsl(153 47% 40% / 0.15), hsl(153 47% 40% / 0.22), hsl(153 47% 40% / 0.28))',
-                      backgroundColor: 'hsl(153 47% 40% / 0.12)'
-                    }}
-                  >
-                    {/* Subtle background gradient */}
-                    <div className={`absolute inset-0 bg-gradient-to-br ${gradients[index]} opacity-20 group-hover:opacity-30 transition-opacity duration-500`} />
-                    
-                    {/* Background pattern */}
-                    <div className="absolute top-0 right-0 w-40 h-40 opacity-25 group-hover:opacity-40 transition-opacity duration-500">
-                      <Icon className="w-full h-full text-primary/50" strokeWidth={1.5} />
-                    </div>
-                    
-                    {/* Animated gradient blob - disabled on mobile */}
-                    {!isMobile && (
-                      <motion.div
-                        className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${gradients[index]} rounded-full blur-2xl opacity-15 group-hover:opacity-25 transition-opacity duration-500`}
-                        animate={{
-                          scale: [1, 1.1, 1],
-                        }}
-                        transition={{
-                          duration: 6,
-                          repeat: Infinity,
-                          ease: "easeInOut"
-                        }}
-                      />
-                    )}
-
+                  <div className="glass-effect rounded-2xl p-6 md:p-8 border border-primary/20 hover:border-primary/40 transition-all duration-300 h-full">
                     {/* Icon container */}
-                    <motion.div 
-                      className="relative mb-6 z-10"
-                      whileHover={isMobile ? {} : { scale: 1.05 }}
-                      transition={{ duration: 0.2 }}
-                    >
-                      <div className={`w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-gradient-to-br ${gradients[index]} flex items-center justify-center shadow-lg shadow-primary/20 group-hover:shadow-primary/40 transition-shadow duration-200`}>
-                        <Icon className="w-8 h-8 md:w-10 md:h-10 text-white" strokeWidth={2.5} />
+                    <div className="relative mb-6 z-10">
+                      <div className="w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center shadow-lg group-hover:shadow-primary/40 transition-shadow duration-300">
+                        <Icon className="w-8 h-8 md:w-10 md:h-10 text-white" strokeWidth={2} />
                       </div>
-                      {/* Pulsing ring - disabled on mobile */}
-                      {!isMobile && (
-                        <motion.div 
-                          className={`absolute inset-0 w-20 h-20 rounded-2xl bg-gradient-to-br ${gradients[index]} opacity-20 blur-xl transition-opacity duration-500`}
-                          animate={{
-                            scale: [1, 1.2, 1],
-                            opacity: [0.2, 0.4, 0.2],
-                          }}
-                          transition={{
-                            duration: 4,
-                            repeat: Infinity,
-                            ease: "easeInOut"
-                          }}
-                        />
-                      )}
-                    </motion.div>
+                    </div>
 
                     {/* Content */}
-                    <div className="relative z-10">
-                      <h3 className="text-2xl font-bold text-foreground mb-3 group-hover:text-primary transition-colors duration-300">
-                        {feature.title}
-                      </h3>
-                      <p className="text-muted-foreground leading-relaxed group-hover:text-foreground transition-colors">
-                        {feature.description}
-                      </p>
-                      
-                      {/* Animated accent bar */}
-                      <motion.div
-                        className={`h-1.5 bg-gradient-to-r ${gradients[index]} rounded-full mt-6 shadow-lg`}
-                        initial={{ width: isMobile ? "60%" : 0 }}
-                        whileInView={isMobile ? {} : { width: "60%" }}
-                        viewport={{ once: true, amount: 0.5 }}
-                        transition={isMobile ? {} : { delay: index * 0.03 + 0.2, duration: 0.3 }}
-                      />
-                    </div>
-
-                    {/* Corner accent - disabled on mobile */}
-                    {!isMobile && (
-                      <>
-                        <div className="absolute bottom-0 left-0 w-24 h-24 overflow-hidden rounded-bl-2xl">
-                          <motion.div
-                            className={`absolute -bottom-12 -left-12 w-24 h-24 bg-gradient-to-br ${gradients[index]} opacity-20 group-hover:opacity-35 transition-opacity duration-500`}
-                            animate={{
-                              rotate: [0, 360],
-                            }}
-                            transition={{
-                              rotate: { duration: 20, repeat: Infinity, ease: "linear" },
-                            }}
-                          />
-                        </div>
-                        
-                        {/* Top right accent */}
-                        <div className="absolute top-0 right-0 w-16 h-16 overflow-hidden rounded-tr-2xl">
-                          <motion.div
-                            className={`absolute -top-8 -right-8 w-16 h-16 bg-gradient-to-br ${gradients[index]} opacity-15 group-hover:opacity-25 transition-opacity duration-500`}
-                            animate={{
-                              rotate: [0, -360],
-                            }}
-                            transition={{
-                              rotate: { duration: 25, repeat: Infinity, ease: "linear" },
-                            }}
-                          />
-                        </div>
-                      </>
-                    )}
+                    <h3 className="text-lg md:text-xl font-bold text-foreground mb-3 group-hover:text-primary transition-colors">
+                      {feature.title}
+                    </h3>
+                    <p className="text-sm md:text-base text-muted-foreground group-hover:text-foreground transition-colors">
+                      {feature.description}
+                    </p>
                   </div>
-                </motion.div>
+                </div>
               );
             })}
           </div>
@@ -420,32 +280,29 @@ const Platform = () => {
       {/* CTA Section */}
       <section className="py-24 bg-gradient-to-br from-primary/10 to-secondary/10">
         <div className="container mx-auto px-4">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: false, amount: 0.3 }}
-            className="max-w-3xl mx-auto text-center"
-          >
-            <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
-              Ready to Experience the Difference?
+          <div className="max-w-4xl mx-auto text-center">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-6">
+              Ready to Experience
+              <br />
+              <span className="text-gradient-primary">The Platform?</span>
             </h2>
-            <p className="text-xl text-muted-foreground mb-8">
-              Join thousands of successful brands and distributors using CIGATY
+            <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-muted-foreground mb-8 md:mb-12">
+              Join thousands of successful drinks businesses already using CIGATY
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link to="/register">
-                <Button size="lg" variant="secondary" className="group">
-                  Register Now
+                <Button size="lg" variant="secondary" className="group w-full sm:w-auto">
+                  Get Started Now
                   <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" size={20} />
                 </Button>
               </Link>
               <Link to="/contact">
-                <Button size="lg" variant="outline">
-                  Get in Touch
+                <Button size="lg" variant="outline" className="w-full sm:w-auto">
+                  Contact Sales
                 </Button>
               </Link>
             </div>
-          </motion.div>
+          </div>
         </div>
       </section>
     </div>
@@ -453,4 +310,3 @@ const Platform = () => {
 };
 
 export default Platform;
-
