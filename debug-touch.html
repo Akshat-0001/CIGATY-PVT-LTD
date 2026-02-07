@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Touch Debug</title>
+</head>
+<body>
+<h1>Touch Debug Script</h1>
+<p>Copy and paste this into your browser console (F12) while on the mobile site:</p>
+<pre style="background: #f4f4f4; padding: 20px; overflow-x: auto;">
+// Debug touch blocking
+document.addEventListener('touchstart', function(e) {
+    const element = e.target;
+    console.log('=== TOUCH START ===');
+    console.log('Element:', element);
+    console.log('Tag:', element.tagName);
+    console.log('Classes:', element.className);
+    console.log('Computed Style:');
+    const style = window.getComputedStyle(element);
+    console.log('  pointer-events:', style.pointerEvents);
+    console.log('  position:', style.position);
+    console.log('  z-index:', style.zIndex);
+    console.log('  overflow-y:', style.overflowY);
+    console.log('  touch-action:', style.touchAction);
+    
+    // Check parent elements
+    let parent = element.parentElement;
+    let level = 1;
+    while (parent && level <= 5) {
+        const pStyle = window.getComputedStyle(parent);
+        console.log(`Parent ${level} (${parent.tagName}.${parent.className}):`);
+        console.log('  pointer-events:', pStyle.pointerEvents);
+        console.log('  overflow-y:', pStyle.overflowY);
+        console.log('  touch-action:', pStyle.touchAction);
+        parent = parent.parentElement;
+        level++;
+    }
+}, true);
+
+// Check what's at screen center
+const centerX = window.innerWidth / 2;
+const centerY = window.innerHeight / 2;
+const centerElement = document.elementFromPoint(centerX, centerY);
+console.log('=== ELEMENT AT SCREEN CENTER ===');
+console.log('Element:', centerElement);
+console.log('Tag:', centerElement.tagName);
+console.log('Classes:', centerElement.className);
+const centerStyle = window.getComputedStyle(centerElement);
+console.log('pointer-events:', centerStyle.pointerEvents);
+console.log('overflow-y:', centerStyle.overflowY);
+console.log('touch-action:', centerStyle.touchAction);
+</pre>
+</body>
+</html>
