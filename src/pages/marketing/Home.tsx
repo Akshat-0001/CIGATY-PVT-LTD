@@ -1,6 +1,4 @@
-import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { useInView } from 'react-intersection-observer';
 import { 
   ArrowRight,
   CheckCircle2,
@@ -8,15 +6,12 @@ import {
   Globe,
   Trophy,
   Shield,
-  Lock,
   TrendingUp,
-  BarChart3,
   FileCheck,
   Users,
   MessageSquare,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { fadeInUp, staggerContainer } from '@/lib/animations';
 
 // Type for benefit card
 type BenefitCardType = {
@@ -29,21 +24,12 @@ type BenefitCardType = {
   gradient: string;
 };
 
-// Separate component for benefit cards to properly use hooks
-const BenefitCard = ({ card, index }: { card: BenefitCardType, index: number }) => {
-  const [ref, inView] = useInView({ threshold: 0.1, triggerOnce: true });
+// Benefit card component
+const BenefitCard = ({ card }: { card: BenefitCardType }) => {
   const Icon = card.icon;
-  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
   
   return (
-    <motion.div
-      ref={ref}
-      initial={{ opacity: 0, y: 30 }}
-      animate={inView ? { opacity: 1, y: 0 } : {}}
-      transition={{ delay: isMobile ? 0 : index * 0.05, duration: isMobile ? 0.3 : 0.5, ease: "easeOut" }}
-      whileHover={isMobile ? {} : { y: -8, scale: 1.01, transition: { duration: 0.2 } }}
-      className="group relative"
-    >
+    <div className="group relative">
       <div 
         className="relative border-2 border-primary/30 rounded-2xl p-4 md:p-6 lg:p-8 h-full hover:border-primary/60 transition-all duration-300 overflow-hidden shadow-lg hover:shadow-xl"
         style={{ 
@@ -51,34 +37,14 @@ const BenefitCard = ({ card, index }: { card: BenefitCardType, index: number }) 
           backgroundColor: 'hsl(153 47% 40% / 0.06)'
         }}
       >
-        {/* Subtle background gradient overlay */}
         <div className={`absolute inset-0 bg-gradient-to-br ${card.gradient} opacity-5 group-hover:opacity-10 transition-opacity duration-500`} />
         
         {/* Icon Container */}
-        <motion.div 
-          className="relative mb-6 z-10"
-          whileHover={isMobile ? {} : { scale: 1.05 }}
-          transition={{ duration: 0.2 }}
-        >
+        <div className="relative mb-6 z-10">
           <div className={`w-16 h-16 rounded-xl bg-gradient-to-br ${card.gradient} flex items-center justify-center shadow-lg shadow-primary/20 group-hover:shadow-primary/40 transition-shadow duration-300`}>
             <Icon className="w-8 h-8 text-white" strokeWidth={2.5} />
           </div>
-          {/* Pulsing ring effect - disabled on mobile */}
-          {!isMobile && (
-            <motion.div 
-              className={`absolute inset-0 w-16 h-16 rounded-xl bg-gradient-to-br ${card.gradient} opacity-20 blur-lg`}
-              animate={{
-                scale: [1, 1.2, 1],
-                opacity: [0.2, 0.05, 0.2],
-              }}
-              transition={{
-                duration: 4,
-                repeat: Infinity,
-                ease: "easeInOut",
-              }}
-            />
-          )}
-        </motion.div>
+        </div>
 
         {/* Content */}
         <div className="relative z-10">
@@ -109,36 +75,20 @@ const BenefitCard = ({ card, index }: { card: BenefitCardType, index: number }) 
             </div>
           )}
         </div>
-
-        {/* Corner accent - disabled on mobile */}
-        {!isMobile && (
-          <div className="absolute bottom-0 right-0 w-20 h-20 overflow-hidden rounded-br-2xl">
-            <motion.div
-              className={`absolute -bottom-10 -right-10 w-20 h-20 bg-gradient-to-br ${card.gradient} opacity-15 group-hover:opacity-25 transition-opacity duration-500`}
-              animate={{
-                rotate: [0, 360],
-              }}
-              transition={{
-                rotate: { duration: 30, repeat: Infinity, ease: "linear" },
-              }}
-            />
-          </div>
-        )}
       </div>
-    </motion.div>
+    </div>
   );
 };
 
 const Home = () => {
-
   const stats = [
-    { label: 'Verified Liquor Partners', value: '5,000+', suffix: '' },
-    { label: 'Global & Indian Brands', value: '600+', suffix: '' },
-    { label: 'Export Regions', value: '10+', suffix: '' },
-    { label: 'in Annual Liquor Trade', value: '₹100 Cr+', suffix: '' },
+    { label: 'Verified Liquor Partners', value: '5,000+' },
+    { label: 'Global & Indian Brands', value: '600+' },
+    { label: 'Export Regions', value: '10+' },
+    { label: 'in Annual Liquor Trade', value: '₹100 Cr+' },
   ];
 
-  const whyChooseCards = [
+  const whyChooseCards: BenefitCardType[] = [
     {
       icon: Trophy,
       title: "India's First B2B Liquor Exchange",
@@ -195,103 +145,67 @@ const Home = () => {
     },
   ];
 
-  // Intersection observers for each section - optimized for mobile
-  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
-  const [heroRef, heroInView] = useInView({ threshold: isMobile ? 0.05 : 0.1, triggerOnce: true });
-  const [benefitsRef, benefitsInView] = useInView({ threshold: isMobile ? 0.05 : 0.1, triggerOnce: true });
-  const [ctaRef, ctaInView] = useInView({ threshold: isMobile ? 0.05 : 0.1, triggerOnce: true });
-
   return (
-    <div className="min-h-screen overflow-x-hidden" style={{ WebkitOverflowScrolling: 'touch' }}>
+    <div className="min-h-screen overflow-x-hidden">
       {/* Hero Section */}
-      <section ref={heroRef} className="relative min-h-screen flex items-center justify-center overflow-hidden">
-        {/* Hero Content */}
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
         <div className="relative z-10 container mx-auto px-4 pt-28 md:pt-32 pb-12 md:pb-20">
           <div className="max-w-5xl mx-auto text-center">
-            <motion.div
-              initial="hidden"
-              animate={heroInView ? "visible" : "hidden"}
-              variants={staggerContainer}
-              transition={{ duration: isMobile ? 0.2 : 0.4 }}
-            >
-              {/* Badge */}
-              <motion.div
-                variants={fadeInUp}
-                className="inline-flex items-center glass-effect rounded-full px-3 md:px-6 py-2 md:py-3 mb-6 md:mb-8 border border-primary/30"
-              >
-                <Sparkles className="w-4 h-4 md:w-5 md:h-5 text-primary mr-2" />
-                <span className="text-primary font-semibold text-xs md:text-sm tracking-wide">
-                  WELCOME TO THE FUTURE OF B2B DRINKS TRADING
-                </span>
-              </motion.div>
+            {/* Badge */}
+            <div className="inline-flex items-center glass-effect rounded-full px-3 md:px-6 py-2 md:py-3 mb-6 md:mb-8 border border-primary/30">
+              <Sparkles className="w-4 h-4 md:w-5 md:h-5 text-primary mr-2" />
+              <span className="text-primary font-semibold text-xs md:text-sm tracking-wide">
+                WELCOME TO THE FUTURE OF B2B DRINKS TRADING
+              </span>
+            </div>
 
-              {/* Main Heading */}
-              <motion.h1
-                variants={fadeInUp}
-                className="text-4xl sm:text-5xl md:text-6xl lg:text-8xl font-bold text-foreground mb-6 md:mb-8 leading-tight px-2"
-              >
-                India's First{' '}
-                <span className="text-gradient-primary inline-block">
-                  B2B Liquor Exchange
-                </span>
-                <br />
-                Platform
-              </motion.h1>
+            {/* Main Heading */}
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-8xl font-bold text-foreground mb-6 md:mb-8 leading-tight px-2">
+              India's First{' '}
+              <span className="text-gradient-primary inline-block">
+                B2B Liquor Exchange
+              </span>
+              <br />
+              Platform
+            </h1>
 
-              {/* Subheading */}
-              <motion.p
-                variants={fadeInUp}
-                className="text-base sm:text-lg md:text-xl lg:text-2xl text-muted-foreground mb-8 md:mb-12 max-w-3xl mx-auto leading-relaxed px-2"
-              >
-                Connect premium spirits and wine brands with distributors worldwide. 
-                Your trusted B2B platform for seamless global trade.
-              </motion.p>
+            {/* Subheading */}
+            <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-muted-foreground mb-8 md:mb-12 max-w-3xl mx-auto leading-relaxed px-2">
+              Connect premium spirits and wine brands with distributors worldwide. 
+              Your trusted B2B platform for seamless global trade.
+            </p>
 
-              {/* CTA Buttons */}
-              <motion.div
-                variants={fadeInUp}
-                className="flex flex-col sm:flex-row gap-4 md:gap-6 justify-center mb-12 md:mb-16 px-4"
-              >
-                <Link to="/register">
-                  <Button size="lg" variant="secondary" className="group text-base md:text-lg px-6 md:px-10 py-4 md:py-5 hover:shadow-xl hover:shadow-primary/30 transition-all w-full sm:w-auto">
-                    Get Started Today
-                    <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform duration-200" size={20} />
-                  </Button>
-                </Link>
-                <Link to="/platform">
-                  <Button size="lg" variant="secondary" className="text-base md:text-lg px-6 md:px-10 py-4 md:py-5 hover:shadow-xl hover:shadow-primary/30 transition-all w-full sm:w-auto">
-                    Explore Platform
-                  </Button>
-                </Link>
-              </motion.div>
+            {/* CTA Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4 md:gap-6 justify-center mb-12 md:mb-16 px-4">
+              <Link to="/register">
+                <Button size="lg" variant="secondary" className="group text-base md:text-lg px-6 md:px-10 py-4 md:py-5 hover:shadow-xl hover:shadow-primary/30 transition-all w-full sm:w-auto">
+                  Get Started Today
+                  <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform duration-200" size={20} />
+                </Button>
+              </Link>
+              <Link to="/platform">
+                <Button size="lg" variant="outline" className="text-base md:text-lg px-6 md:px-10 py-4 md:py-5 hover:shadow-xl hover:shadow-primary/30 transition-all w-full sm:w-auto">
+                  Explore Platform
+                </Button>
+              </Link>
+            </div>
 
-              {/* Stats Grid */}
-              <motion.div
-                variants={fadeInUp}
-                className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6 max-w-4xl mx-auto px-2"
-              >
-                {stats.map((stat, index) => {
-                  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
-                  return (
-                    <motion.div
-                      key={stat.label}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={heroInView ? { opacity: 1, y: 0 } : {}}
-                      transition={{ delay: isMobile ? 0.2 : 0.8 + index * 0.1, duration: 0.4, ease: "easeOut" }}
-                      whileHover={isMobile ? {} : { scale: 1.02, y: -2 }}
-                      className="glass-effect rounded-xl p-4 md:p-6 border border-primary/20 hover:border-primary/50 transition-all duration-200"
-                    >
-                    <div className="text-2xl md:text-4xl lg:text-5xl font-bold text-gradient-primary mb-1 md:mb-2">
-                      {stat.value}
-                    </div>
-                    <div className="text-xs md:text-sm lg:text-base text-muted-foreground font-medium leading-tight">
-                      {stat.label}
-                    </div>
-                  </motion.div>
-                  );
-                })}
-              </motion.div>
-            </motion.div>
+            {/* Stats Grid */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6 max-w-4xl mx-auto px-2">
+              {stats.map((stat) => (
+                <div
+                  key={stat.label}
+                  className="glass-effect rounded-xl p-4 md:p-6 border border-primary/20 hover:border-primary/50 transition-all duration-200"
+                >
+                  <div className="text-2xl md:text-4xl lg:text-5xl font-bold text-gradient-primary mb-1 md:mb-2">
+                    {stat.value}
+                  </div>
+                  <div className="text-xs md:text-sm lg:text-base text-muted-foreground font-medium leading-tight">
+                    {stat.label}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
@@ -300,8 +214,7 @@ const Home = () => {
       <div className="section-divider my-8" />
 
       {/* Why Choose CIGATY Section */}
-      <section ref={benefitsRef} className="py-16 md:py-24 lg:py-32 bg-gradient-to-b from-background to-primary/5 relative overflow-hidden">
-        {/* Background decoration */}
+      <section className="py-16 md:py-24 lg:py-32 bg-gradient-to-b from-background to-primary/5 relative overflow-hidden">
         <div className="absolute inset-0 opacity-5">
           <div className="absolute top-20 left-10 w-96 h-96 bg-primary/10 rounded-full blur-3xl" />
           <div className="absolute bottom-20 right-10 w-96 h-96 bg-secondary/10 rounded-full blur-3xl" />
@@ -309,45 +222,35 @@ const Home = () => {
 
         <div className="container mx-auto px-4 relative z-10">
           {/* Section Header */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={benefitsInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: isMobile ? 0.3 : 0.6 }}
-            className="text-center mb-8 md:mb-16"
-          >
+          <div className="text-center mb-8 md:mb-16">
             <span className="text-primary font-semibold text-sm tracking-widest uppercase mb-4 inline-block">
               Why Choose CIGATY
             </span>
-            <h2 className="text-5xl md:text-6xl font-bold text-foreground mb-6 leading-tight">
+            <h2 className="text-3xl md:text-5xl lg:text-6xl font-bold text-foreground mb-6 leading-tight">
               Why Industry Leaders
               <br />
               <span className="text-gradient-primary">Choose CIGATY</span>
             </h2>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+            <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
               The only platform built specifically for global drinks trade. 
               Join thousands of successful brands and distributors worldwide.
             </p>
-          </motion.div>
+          </div>
 
           {/* 3-Column Grid of Benefit Cards */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 max-w-7xl mx-auto px-4">
-            {whyChooseCards.map((card, index) => (
-              <BenefitCard key={card.title} card={card} index={index} />
+            {whyChooseCards.map((card) => (
+              <BenefitCard key={card.title} card={card} />
             ))}
           </div>
 
           {/* Trust Badges */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={benefitsInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ delay: isMobile ? 0.2 : 0.6, duration: isMobile ? 0.2 : 0.4 }}
-            className="mt-8 md:mt-16 flex flex-wrap justify-center gap-4 md:gap-6"
-          >
+          <div className="mt-8 md:mt-16 flex flex-wrap justify-center gap-4 md:gap-6">
             {[
               { text: "Bank-Level Security", icon: Shield },
               { text: "Verified Partners", icon: CheckCircle2 },
               { text: "Global Reach", icon: Globe },
-            ].map((badge, index) => {
+            ].map((badge) => {
               const BadgeIcon = badge.icon;
               return (
                 <div
@@ -359,53 +262,29 @@ const Home = () => {
                 </div>
               );
             })}
-          </motion.div>
+          </div>
 
           {/* CTA */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={benefitsInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ delay: isMobile ? 0.3 : 0.8, duration: isMobile ? 0.2 : 0.4 }}
-            className="mt-8 md:mt-12 text-center"
-          >
+          <div className="mt-8 md:mt-12 text-center">
             <Link to="/platform">
               <Button variant="outline" size="lg" className="group">
                 See How It Works
                 <ArrowRight className="ml-2 group-hover:translate-x-1 transition-transform" size={20} />
               </Button>
             </Link>
-          </motion.div>
+          </div>
         </div>
-        </section>
+      </section>
 
-        {/* Section Divider */}
-        <div className="section-divider my-8" />
+      {/* Section Divider */}
+      <div className="section-divider my-8" />
 
-        {/* Final CTA Section */}
-        <section ref={ctaRef} className="py-16 md:py-24 lg:py-32 relative overflow-hidden">
-        {/* Animated background */}
+      {/* Final CTA Section */}
+      <section className="py-16 md:py-24 lg:py-32 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/20 to-secondary/10" />
-        {typeof window !== 'undefined' && window.innerWidth >= 768 && (
-          <motion.div
-            className="absolute inset-0"
-            animate={{
-              backgroundPosition: ['0% 0%', '100% 100%'],
-            }}
-            transition={{
-              duration: 20,
-              repeat: Infinity,
-              repeatType: "reverse"
-            }}
-          />
-        )}
 
         <div className="container mx-auto px-4 relative z-10">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={ctaInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: isMobile ? 0.3 : 0.5 }}
-            className="max-w-4xl mx-auto text-center"
-          >
+          <div className="max-w-4xl mx-auto text-center">
             <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-bold text-foreground mb-6 md:mb-8 leading-tight px-2">
               Ready to Transform Your
               <br />
@@ -421,7 +300,7 @@ const Home = () => {
                 <ArrowRight className="ml-2 md:ml-3" size={20} />
               </Button>
             </Link>
-          </motion.div>
+          </div>
         </div>
       </section>
     </div>
@@ -429,4 +308,3 @@ const Home = () => {
 };
 
 export default Home;
-
