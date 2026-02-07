@@ -10,6 +10,9 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
+    /* Force light theme always - ignore device dark mode */
+    color-scheme: light;
+    
     /* Light Theme - Warm Golden/Champagne Tint */
     --background: 42 45% 92%;
     --foreground: 222 47% 12%;
@@ -70,48 +73,58 @@ All colors MUST be HSL.
   }
 
   .dark {
-    --background: 222 47% 7%;
-    --foreground: 210 40% 98%;
+    /* Disable dark mode - use light theme colors instead */
+    color-scheme: light;
+    
+    --background: 42 45% 92%;
+    --foreground: 222 47% 12%;
 
-    --card: 222 47% 7%;
-    --card-foreground: 210 40% 98%;
+    --card: 42 30% 97%;
+    --card-foreground: 222 47% 12%;
 
-    --popover: 222 47% 7%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 42 30% 97%;
+    --popover-foreground: 222 47% 12%;
 
-    --primary: 221 83% 63%;
-    --primary-foreground: 222 47% 7%;
+    --primary: 153 47% 40%;
+    --primary-foreground: 0 0% 100%;
+    --primary-light: 153 45% 55%;
+    --primary-lighter: 153 40% 70%;
+    --primary-lightest: 153 35% 90%;
 
-    --secondary: 199 89% 58%;
-    --secondary-foreground: 222 47% 7%;
+    --secondary: 28 35% 32%;
+    --secondary-foreground: 0 0% 100%;
+    --secondary-light: 28 30% 45%;
+    --secondary-lighter: 28 25% 60%;
 
-    --muted: 217 33% 17%;
-    --muted-foreground: 215 16% 67%;
+    --muted: 42 35% 94%;
+    --muted-foreground: 220 14% 46%;
 
-    --accent: 142 76% 46%;
-    --accent-foreground: 222 47% 7%;
+    --accent: 153 47% 40%;
+    --accent-foreground: 0 0% 100%;
+    --accent-warm: 45 60% 65%;
+    --accent-cool: 180 30% 70%;
 
-    --destructive: 0 63% 31%;
+    --destructive: 0 72% 50%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 217 33% 20%;
-    --input: 217 33% 20%;
-    --ring: 217 91% 60%;
+    --warning: 38 90% 56%;
+    --warning-foreground: 24 100% 12%;
 
-    --success: 142 76% 46%;
-    --success-foreground: 222 47% 7%;
+    --border: 42 30% 87%;
+    --input: 42 30% 87%;
+    --ring: 46 65% 56%;
 
-    --warning: 42 96% 56%;
-    --warning-foreground: 24 100% 10%;
+    --success: 142 45% 35%;
+    --success-foreground: 0 0% 100%;
 
-    --sidebar-background: 222 47% 7%;
-    --sidebar-foreground: 210 40% 98%;
-    --sidebar-primary: 221 83% 63%;
-    --sidebar-primary-foreground: 222 47% 7%;
-    --sidebar-accent: 217 33% 17%;
-    --sidebar-accent-foreground: 210 40% 98%;
-    --sidebar-border: 217 33% 20%;
-    --sidebar-ring: 217 91% 60%;
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 222 47% 12%;
+    --sidebar-primary: 46 65% 56%;
+    --sidebar-primary-foreground: 0 0% 10%;
+    --sidebar-accent: 210 30% 95%;
+    --sidebar-accent-foreground: 222 47% 12%;
+    --sidebar-border: 210 26% 90%;
+    --sidebar-ring: 46 65% 64%;
   }
 }
 

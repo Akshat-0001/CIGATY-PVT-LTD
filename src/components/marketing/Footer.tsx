@@ -62,11 +62,11 @@ export const MarketingFooter = () => {
               </a>
               <a href="tel:+1234567890" className="flex items-center text-muted-foreground hover:text-primary transition-colors">
                 <Phone className="w-5 h-5 mr-3" />
-                +91 7973059650
+                +91 9717194419
               </a>
               <div className="flex items-start text-muted-foreground">
                 <MapPin className="w-5 h-5 mr-3 mt-1 flex-shrink-0" />
-                <span>Chandigarh, Punjab, IN 140413</span>
+                <span>Dubai, UAE</span>
               </div>
             </div>
           </div>

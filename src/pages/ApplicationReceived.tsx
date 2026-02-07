@@ -282,7 +282,7 @@ const ApplicationReceived = () => {
                     <span className="sm:hidden">Email Support</span>
                   </a>
                   <a 
-                    href="tel:+917973059650"
+                    href="tel:+919717194419"
                     className="px-4 md:px-6 py-2 md:py-3 bg-primary text-primary-foreground rounded-xl hover:bg-primary/90 transition-all font-semibold text-sm md:text-base"
                   >
                     +91 797 305 9650
