@@ -28,8 +28,10 @@ export const authHelpers = {
   },
 
   // Sign in existing user
-  async signIn(email: string, password: string) {
+  async signIn(email: string, password: string, rememberMe: boolean = true) {
     try {
+      // Supabase client is configured with localStorage by default (persistent)
+      // Sessions will persist across browser restarts
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,

@@ -1,6 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 import {
   Mail,
@@ -38,6 +37,18 @@ const Register = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [generalError, setGeneralError] = useState('');
+
+  // Check if user is already logged in
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        // User is already logged in, redirect to dashboard
+        navigate('/live-offers', { replace: true });
+      }
+    };
+    checkSession();
+  }, [navigate]);
 
   // Step 1: Account Details
   const [accountData, setAccountData] = useState({
@@ -356,28 +367,17 @@ const Register = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="max-w-4xl w-full space-y-8 relative z-10"
-      >
+      <div className="max-w-4xl w-full space-y-8">
         {/* Logo and Title */}
         <div className="text-center">
           <Link to="/" className="inline-flex items-center justify-center space-x-3 mb-6">
-            <motion.div
-              whileHover={{ scale: 1.1, rotate: 360 }}
-              transition={{ duration: 0.6, type: "spring" }}
-            >
-              <img 
-                src="/logo.png" 
-                alt="CIGATY Logo" 
-                className="w-16 h-16 object-contain"
-              />
-            </motion.div>
+            <img 
+              src="/logo.png" 
+              alt="CIGATY Logo" 
+              className="w-16 h-16 object-contain"
+            />
             <div>
-              <h2 className="text-3xl font-bold" style={{ color: '#D4AF37' }}>CIGATY</h2>
+              <h2 className="text-3xl font-bold text-primary">CIGATY</h2>
               <p className="text-xs text-muted-foreground">India's First B2B Liquor Exchange</p>
             </div>
           </Link>
@@ -394,14 +394,11 @@ const Register = () => {
             {steps.map((step, index) => (
               <div key={step.number} className="flex items-center">
                 <div className="flex flex-col items-center">
-                  <motion.div
-                    initial={false}
-                    animate={{
-                      scale: currentStep === step.number ? 1.1 : 1,
-                      backgroundColor: currentStep >= step.number ? '#D4AF37' : 'hsl(var(--muted))',
-                    }}
-                    className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${
-                      currentStep >= step.number ? 'text-foreground' : 'text-muted-foreground'
+                  <div
+                    className={`w-10 h-10 rounded-full flex items-center justify-center font-bold transition-colors ${
+                      currentStep >= step.number 
+                        ? 'bg-primary text-primary-foreground' 
+                        : 'bg-muted text-muted-foreground'
                     }`}
                   >
                     {currentStep > step.number ? (
@@ -409,21 +406,18 @@ const Register = () => {
                     ) : (
                       step.number
                     )}
-                  </motion.div>
+                  </div>
                   <span className={`text-xs mt-2 ${
-                    currentStep >= step.number ? 'text-foreground' : 'text-muted-foreground'
-                  }`}
-                  style={currentStep >= step.number ? { color: '#D4AF37' } : {}}
-                  >
+                    currentStep >= step.number ? 'text-primary font-medium' : 'text-muted-foreground'
+                  }`}>
                     {step.title}
                   </span>
                 </div>
                 {index < steps.length - 1 && (
                   <div 
                     className={`w-16 h-0.5 mx-2 ${
-                      currentStep > step.number ? '' : 'bg-muted'
+                      currentStep > step.number ? 'bg-primary' : 'bg-muted'
                     }`}
-                    style={currentStep > step.number ? { backgroundColor: '#D4AF37' } : {}}
                   />
                 )}
               </div>
@@ -432,34 +426,17 @@ const Register = () => {
         </div>
 
         {/* Form */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.2, duration: 0.4 }}
-          className="card bg-card/95 backdrop-blur-lg border-2 border-primary/20 hover:border-primary/40 transition-all"
-        >
+        <div className="bg-card rounded-lg p-6 border">
           {generalError && (
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="mb-6 p-4 bg-wine/20 border border-wine rounded-lg flex items-start"
-            >
-              <AlertCircle className="w-5 h-5 text-wine mr-3 flex-shrink-0 mt-0.5" />
+            <div className="mb-6 p-4 bg-destructive/10 border border-destructive rounded-lg flex items-start">
+              <AlertCircle className="w-5 h-5 text-destructive mr-3 flex-shrink-0 mt-0.5" />
               <p className="text-sm text-foreground">{generalError}</p>
-            </motion.div>
+            </div>
           )}
 
-          <AnimatePresence mode="wait">
-            {/* Step 1: Account Details */}
-            {currentStep === 1 && (
-              <motion.div
-                key="step1"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.3 }}
-                className="space-y-6"
-              >
+          {/* Step 1: Account Details */}
+          {currentStep === 1 && (
+            <div className="space-y-6">
                 <div className="grid md:grid-cols-3 gap-6">
                   <Input
                     label="First Name"
@@ -583,19 +560,12 @@ const Register = () => {
                   icon={<Lock size={20} />}
                   required
                 />
-              </motion.div>
+              </div>
             )}
 
             {/* Step 2: Company Details */}
             {currentStep === 2 && (
-              <motion.div
-                key="step2"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.3 }}
-                className="space-y-6"
-              >
+              <div className="space-y-6">
                 <Input
                   label="Company Name"
                   name="companyName"
@@ -699,19 +669,12 @@ const Register = () => {
                   required
                   helperText="Enter the primary director's name"
                 />
-              </motion.div>
+              </div>
             )}
 
             {/* Step 3: Document Upload */}
             {currentStep === 3 && (
-              <motion.div
-                key="step3"
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.3 }}
-                className="space-y-6"
-              >
+              <div className="space-y-6">
                 <div>
                   <h3 className="text-xl font-semibold text-foreground mb-2">Upload Required Documents</h3>
                   <p className="text-muted-foreground mb-6">
@@ -757,9 +720,8 @@ const Register = () => {
                     onRemove={() => removeDocument('vatCert')}
                   />
                 </div>
-              </motion.div>
+              </div>
             )}
-          </AnimatePresence>
 
           {/* Navigation Buttons */}
           <div className="mt-8 flex justify-between">
@@ -792,20 +754,19 @@ const Register = () => {
               )}
             </div>
           </div>
-        </motion.div>
+        </div>
 
         {/* Login Link */}
         <p className="text-center text-muted-foreground">
           Already have an account?{' '}
           <Link
             to="/login"
-            className="font-semibold transition-colors"
-            style={{ color: '#D4AF37' }}
+            className="text-primary hover:text-primary/80 font-semibold transition-colors"
           >
             Sign in here
           </Link>
         </p>
-      </motion.div>
+      </div>
     </div>
   );
 };
@@ -846,15 +807,14 @@ const DocumentUploadField = ({ label, required, file, error, onSelect, onRemove 
           {...getRootProps()}
           className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-all ${
             isDragActive
-              ? 'bg-primary/10'
+              ? 'bg-primary/10 border-primary'
               : error
               ? 'border-destructive bg-destructive/10'
               : 'border-border hover:border-primary/50'
           }`}
-          style={isDragActive ? { borderColor: '#D4AF37' } : error ? {} : {}}
         >
           <input {...getInputProps()} />
-          <Upload className="w-8 h-8 mx-auto mb-2" style={{ color: '#D4AF37' }} />
+          <Upload className="w-8 h-8 mx-auto mb-2 text-primary" />
           {isDragActive ? (
             <p className="text-foreground">Drop the file here...</p>
           ) : (
@@ -867,7 +827,7 @@ const DocumentUploadField = ({ label, required, file, error, onSelect, onRemove 
       ) : (
         <div className="flex items-center justify-between p-4 bg-muted rounded-lg border border-border">
           <div className="flex items-center space-x-3">
-            <FileText className="w-6 h-6" style={{ color: '#D4AF37' }} />
+            <FileText className="w-6 h-6 text-primary" />
             <div>
               <p className="text-foreground font-medium text-sm">{file.name}</p>
               <p className="text-xs text-muted-foreground">
@@ -877,7 +837,7 @@ const DocumentUploadField = ({ label, required, file, error, onSelect, onRemove 
           </div>
           <button
             onClick={onRemove}
-            className="text-gray-400 hover:text-wine transition-colors"
+            className="text-muted-foreground hover:text-destructive transition-colors"
           >
             <X size={20} />
           </button>
@@ -885,7 +845,7 @@ const DocumentUploadField = ({ label, required, file, error, onSelect, onRemove 
       )}
 
       {error && (
-        <p className="text-wine text-sm mt-1">{error}</p>
+        <p className="text-destructive text-sm mt-1">{error}</p>
       )}
     </div>
   );

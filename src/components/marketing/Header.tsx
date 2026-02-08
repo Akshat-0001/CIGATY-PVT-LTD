@@ -1,13 +1,16 @@
 import { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { supabase } from '@/integrations/supabase/client';
 
 export const MarketingHeader = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -16,6 +19,23 @@ export const MarketingHeader = () => {
 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Check if user is logged in
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setIsLoggedIn(!!session);
+    };
+    
+    checkAuth();
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsLoggedIn(!!session);
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
   const navLinks = [
@@ -94,17 +114,29 @@ export const MarketingHeader = () => {
 
           {/* Auth Buttons - Desktop */}
           <div className="hidden lg:flex items-center space-x-4">
-            <Link
-              to="/login"
-              className="text-foreground hover:text-primary transition-colors duration-300 font-medium"
-            >
-              Login
-            </Link>
-            <Link to="/register">
-              <Button variant="secondary" size="sm">
-                Sign Up
+            {isLoggedIn ? (
+              <Button 
+                variant="secondary" 
+                size="sm"
+                onClick={() => navigate('/live-offers')}
+              >
+                Go to Dashboard
               </Button>
-            </Link>
+            ) : (
+              <>
+                <Link
+                  to="/login"
+                  className="text-foreground hover:text-primary transition-colors duration-300 font-medium"
+                >
+                  Login
+                </Link>
+                <Link to="/register">
+                  <Button variant="secondary" size="sm">
+                    Sign Up
+                  </Button>
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -155,20 +187,35 @@ export const MarketingHeader = () => {
                 </Link>
               ))}
               <div className="pt-4 border-t border-border flex flex-col space-y-3">
-                <Link
-                  to="/login"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="btn-outline text-center"
-                >
-                  Login
-                </Link>
-                <Link
-                  to="/register"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="btn-secondary text-center"
-                >
-                  Sign Up
-                </Link>
+                {isLoggedIn ? (
+                  <Button 
+                    variant="secondary"
+                    onClick={() => {
+                      setIsMobileMenuOpen(false);
+                      navigate('/live-offers');
+                    }}
+                    className="w-full"
+                  >
+                    Go to Dashboard
+                  </Button>
+                ) : (
+                  <>
+                    <Link
+                      to="/login"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="btn-outline text-center"
+                    >
+                      Login
+                    </Link>
+                    <Link
+                      to="/register"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="btn-secondary text-center"
+                    >
+                      Sign Up
+                    </Link>
+                  </>
+                )}
               </div>
             </nav>
           </motion.div>

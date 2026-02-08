@@ -1,11 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
 import { Mail, Lock, Eye, EyeOff, AlertCircle } from 'lucide-react';
 import Input from '../components/forms/Input';
 import Button from '../components/forms/Button';
 import { authHelpers } from '../lib/supabase';
+import { supabase } from '@/integrations/supabase/client';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -13,11 +13,25 @@ const Login = () => {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
+    rememberMe: false,
   });
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [generalError, setGeneralError] = useState('');
+
+  // Check if user is already logged in
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        // User is already logged in, redirect to dashboard
+        const from = (location.state as any)?.from || '/live-offers';
+        navigate(from, { replace: true });
+      }
+    };
+    checkSession();
+  }, [navigate, location]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -65,7 +79,8 @@ const Login = () => {
       
       const { data, error } = await authHelpers.signIn(
         formData.email,
-        formData.password
+        formData.password,
+        formData.rememberMe
       );
 
       if (error) {
@@ -91,28 +106,17 @@ const Login = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="max-w-md w-full space-y-8 relative z-10"
-      >
+      <div className="max-w-md w-full space-y-8">
         {/* Logo and Title */}
         <div className="text-center">
           <Link to="/" className="inline-flex items-center justify-center space-x-3 mb-6">
-            <motion.div
-              whileHover={{ scale: 1.1, rotate: 360 }}
-              transition={{ duration: 0.6, type: "spring" }}
-            >
-              <img 
-                src="/logo.png" 
-                alt="CIGATY Logo" 
-                className="w-16 h-16 object-contain"
-              />
-            </motion.div>
+            <img 
+              src="/logo.png" 
+              alt="CIGATY Logo" 
+              className="w-16 h-16 object-contain"
+            />
             <div>
-              <h2 className="text-3xl font-bold font-display" style={{ color: '#D4AF37' }}>CIGATY</h2>
+              <h2 className="text-3xl font-bold font-display text-primary">CIGATY</h2>
               <p className="text-xs text-muted-foreground">India's First B2B Liquor Exchange</p>
             </div>
           </Link>
@@ -124,21 +128,12 @@ const Login = () => {
         </div>
 
         {/* Login Form */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.2, duration: 0.4 }}
-          className="card bg-card/95 backdrop-blur-lg border-2 border-primary/20 hover:border-primary/40 transition-all"
-        >
+        <div className="bg-card rounded-lg p-6 border">
           {generalError && (
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="mb-6 p-4 bg-wine/20 border border-wine rounded-lg flex items-start"
-            >
-              <AlertCircle className="w-5 h-5 text-wine mr-3 flex-shrink-0 mt-0.5" />
+            <div className="mb-6 p-4 bg-destructive/10 border border-destructive rounded-lg flex items-start">
+              <AlertCircle className="w-5 h-5 text-destructive mr-3 flex-shrink-0 mt-0.5" />
               <p className="text-sm text-foreground">{generalError}</p>
-            </motion.div>
+            </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -176,19 +171,20 @@ const Login = () => {
             </div>
 
             <div className="flex items-center justify-between">
-              <label className="flex items-center">
+              <label className="flex items-center cursor-pointer">
                 <input
                   type="checkbox"
-                  className="w-4 h-4 rounded border-dark-light bg-dark text-wine 
-                           focus:ring-wine focus:ring-offset-dark"
+                  checked={formData.rememberMe}
+                  onChange={(e) => setFormData(prev => ({ ...prev, rememberMe: e.target.checked }))}
+                  className="w-4 h-4 rounded border-input bg-background text-primary 
+                           focus:ring-primary focus:ring-offset-background"
                 />
                 <span className="ml-2 text-sm text-muted-foreground">Remember me</span>
               </label>
 
               <Link
                 to="/forgot-password"
-                className="text-sm transition-colors"
-                style={{ color: '#D4AF37' }}
+                className="text-sm text-primary hover:text-primary/80 transition-colors"
               >
                 Forgot password?
               </Link>
@@ -204,7 +200,7 @@ const Login = () => {
               {isSubmitting ? 'Signing in...' : 'Sign In'}
             </Button>
           </form>
-        </motion.div>
+        </div>
 
         {/* Sign Up Link */}
         <p className="text-center text-muted-foreground">
@@ -212,12 +208,11 @@ const Login = () => {
           <Link
             to="/register"
             className="text-primary hover:text-primary/80 font-semibold transition-colors"
-            style={{ color: '#D4AF37' }}
           >
             Sign up for free
           </Link>
         </p>
-      </motion.div>
+      </div>
     </div>
   );
 };
