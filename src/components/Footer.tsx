@@ -1,6 +1,4 @@
 import { Link } from "react-router-dom";
-import { MessageCircle } from "lucide-react";
-import { Button } from "./ui/button";
 
 export const Footer = () => {
   return (
@@ -33,13 +31,6 @@ export const Footer = () => {
             Contact
           </Link>
         </div>
-        
-        <Button 
-          size="icon"
-          className="fixed bottom-4 right-4 h-14 w-14 rounded-full bg-primary hover:bg-primary/90 shadow-lg"
-        >
-          <MessageCircle className="h-6 w-6 text-primary-foreground" />
-        </Button>
       </div>
     </footer>
   );
