@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { Search, Eye, MoreHorizontal } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -29,6 +30,8 @@ export default function MyStock() {
   const qc = useQueryClient();
   const [tab, setTab] = useState('all');
   const [query, setQuery] = useState('');
+  const [selectedItem, setSelectedItem] = useState<any>(null);
+  const [showActionSheet, setShowActionSheet] = useState(false);
   const { data } = useQuery({ queryKey: ["my_listings"], queryFn: fetchMyListings, placeholderData: (p)=>p??[] });
 
   const items = useMemo(()=> (data||[]) as any[], [data]);
@@ -62,17 +65,40 @@ export default function MyStock() {
   };
 
   const makeLive = async (item: any) => {
-    if (item.status === 'approved' && item.ui_status === 'idle') {
-      await (supabase as any).rpc('update_listing_intent', { _id: item.id, _ui_status: 'live' });
-    } else {
-      await (supabase as any).rpc('update_listing_go_live', { _id: item.id });
+    try {
+      let error;
+      if (item.status === 'approved' && item.ui_status === 'idle') {
+        const result = await (supabase as any).rpc('update_listing_intent', { _id: item.id, _ui_status: 'live' });
+        error = result.error;
+      } else {
+        const result = await (supabase as any).rpc('update_listing_go_live', { _id: item.id });
+        error = result.error;
+      }
+      if (error) {
+        console.error('Error making listing live:', error);
+        alert('Failed to make listing live. Please try again.');
+        return;
+      }
+      await qc.invalidateQueries({ queryKey: ["my_listings"] });
+    } catch (err) {
+      console.error('Error:', err);
+      alert('Failed to make listing live. Please try again.');
     }
-    qc.invalidateQueries({ queryKey: ["my_listings"] });
   };
 
   const makeIdle = async (id: string) => {
-    await (supabase as any).rpc('update_listing_intent', { _id: id, _ui_status: 'idle' });
-    qc.invalidateQueries({ queryKey: ["my_listings"] });
+    try {
+      const { error } = await (supabase as any).rpc('update_listing_intent', { _id: id, _ui_status: 'idle' });
+      if (error) {
+        console.error('Error making listing idle:', error);
+        alert('Failed to make listing idle. Please try again.');
+        return;
+      }
+      await qc.invalidateQueries({ queryKey: ["my_listings"] });
+    } catch (err) {
+      console.error('Error:', err);
+      alert('Failed to make listing idle. Please try again.');
+    }
   };
 
   const delListing = async (id: string) => {
@@ -95,8 +121,8 @@ export default function MyStock() {
 
       <div>
         <Tabs value={tab} onValueChange={setTab} className="w-full">
-          <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0 mb-6">
-            <TabsList className="mb-6 glass-nav-item w-max md:w-full">
+          <div className="overflow-x-auto scrollbar-thin -mx-4 px-4 md:mx-0 md:px-0 mb-6 touch-pan-x">
+            <TabsList className="mb-6 glass-nav-item w-max md:w-full inline-flex">
               <TabsTrigger value="all" className="whitespace-nowrap">All ({count('all')})</TabsTrigger>
               <TabsTrigger value="approved" className="whitespace-nowrap">Live ({count('approved')})</TabsTrigger>
               <TabsTrigger value="pending" className="whitespace-nowrap">Pending ({count('pending')})</TabsTrigger>
@@ -159,9 +185,11 @@ export default function MyStock() {
                     </div>
                 <div className="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center md:justify-start justify-end">
                   <Button size="sm" variant="outline" className="w-full sm:w-auto" onClick={()=> navigate(`/product/${item.id}`)}><Eye className="h-4 w-4"/> <span className="hidden sm:inline">View</span></Button>
+                  
+                  {/* Desktop: Dropdown Menu */}
                   <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button size="sm" variant="ghost" className="w-full sm:w-auto"><MoreHorizontal className="h-4 w-4"/></Button>
+                    <DropdownMenuTrigger asChild className="hidden md:flex">
+                      <Button size="sm" variant="ghost"><MoreHorizontal className="h-4 w-4"/></Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                       <DropdownMenuItem onClick={()=> navigate(`/add-listing?id=${item.id}`)}>Edit</DropdownMenuItem>
@@ -176,6 +204,19 @@ export default function MyStock() {
                       )}
                     </DropdownMenuContent>
                   </DropdownMenu>
+
+                  {/* Mobile: Sheet */}
+                  <Button 
+                    size="sm" 
+                    variant="ghost" 
+                    className="w-full sm:w-auto md:hidden"
+                    onClick={() => {
+                      setSelectedItem(item);
+                      setShowActionSheet(true);
+                    }}
+                  >
+                    <MoreHorizontal className="h-4 w-4"/>
+                  </Button>
                 </div>
                 {/* Mobile-only compact meta row */}
                 <div className="flex md:hidden items-center justify-between text-xs text-muted-foreground">
@@ -193,6 +234,63 @@ export default function MyStock() {
         </TabsContent>
       </Tabs>
       </div>
+
+      {/* Mobile Action Sheet */}
+      <Sheet open={showActionSheet} onOpenChange={setShowActionSheet}>
+        <SheetContent side="bottom" className="h-auto">
+          <SheetHeader>
+            <SheetTitle>Actions</SheetTitle>
+          </SheetHeader>
+          <div className="mt-6 grid gap-2 pb-24">
+            <Button
+              variant="outline"
+              onClick={() => {
+                navigate(`/add-listing?id=${selectedItem?.id}`);
+                setShowActionSheet(false);
+              }}
+              className="justify-start"
+            >
+              Edit
+            </Button>
+            {selectedItem && (selectedItem.ui_status === 'draft' || selectedItem.ui_status === 'idle' || selectedItem.status==='rejected') && (
+              <Button
+                variant="outline"
+                onClick={() => {
+                  makeLive(selectedItem);
+                  setShowActionSheet(false);
+                }}
+                className="justify-start"
+              >
+                Make Live
+              </Button>
+            )}
+            {selectedItem && (selectedItem.status === 'approved' || (selectedItem.status==='pending' && selectedItem.ui_status==='live')) && (
+              <Button
+                variant="outline"
+                onClick={() => {
+                  makeIdle(selectedItem.id);
+                  setShowActionSheet(false);
+                }}
+                className="justify-start"
+              >
+                Make Idle
+              </Button>
+            )}
+            {selectedItem && (selectedItem.ui_status === 'draft' || selectedItem.status==='rejected' || selectedItem.status==='pending') && (
+              <Button
+                variant="outline"
+                onClick={() => {
+                  delListing(selectedItem.id);
+                  setShowActionSheet(false);
+                }}
+                className="justify-start text-destructive"
+              >
+                Delete
+              </Button>
+            )}
+          </div>
+        </SheetContent>
+      </Sheet>
     </div>
   );
 }

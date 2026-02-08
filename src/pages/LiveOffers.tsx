@@ -52,6 +52,9 @@ export default function LiveOffers() {
   const [activeCategory, setActiveCategory] = useState<string>("All");
   const [activeSubcategory, setActiveSubcategory] = useState<string>("");
   const [sortKey, setSortKey] = useState<string>("price_asc");
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
+  const [showSubcategorySheet, setShowSubcategorySheet] = useState(false);
+  const [selectedCategoryForSheet, setSelectedCategoryForSheet] = useState<string>("");
 
   const { data, isLoading, error } = useQuery({ queryKey: ["live_offers_v2"], queryFn: fetchApprovedListings });
   const { data: warehouses } = useQuery({ queryKey: ["warehouses"], queryFn: fetchWarehouses });
@@ -111,77 +114,131 @@ export default function LiveOffers() {
   };
 
   const CategoryTabs = () => (
-    <motion.div
-      className="flex items-center gap-3 flex-wrap overflow-visible"
-      initial="hidden"
-      animate="visible"
-      variants={staggerContainer}
-    >
-      {['All','Beer','Wine','Spirits','Champagne','Other'].map((cat, index) => {
-        const categories = ['All','Beer','Wine','Spirits','Champagne','Other'];
-        const isLastTwo = index >= categories.length - 2; // Last two items
-        
-        return (
-          <motion.div
-            key={cat}
-            variants={fadeInUp}
-            className="relative group/category"
-          >
+    <>
+      <motion.div
+        className="flex items-center gap-3 flex-wrap overflow-visible relative"
+        initial="hidden"
+        animate="visible"
+        variants={staggerContainer}
+      >
+        {['All','Beer','Wine','Spirits','Champagne','Other'].map((cat, index) => {
+          const categories = ['All','Beer','Wine','Spirits','Champagne','Other'];
+          const isLastTwo = index >= categories.length - 2;
+          const isOpen = openDropdown === cat;
+          
+          return (
             <motion.div
-              whileHover={hoverScale}
-              whileTap={tapScale}
-              transition={springTransition}
+              key={cat}
+              variants={fadeInUp}
+              className="relative group/category"
             >
               <Button
                 size="sm"
                 variant={activeCategory === cat ? 'secondary' : 'ghost'}
-                onClick={() => { setActiveCategory(cat); setActiveSubcategory(''); }}
+                onClick={() => { 
+                  if (cat === 'All') {
+                    setActiveCategory(cat); 
+                    setActiveSubcategory('');
+                    setOpenDropdown(null);
+                  } else {
+                    // On mobile, open sheet for subcategories
+                    if (window.innerWidth < 768) {
+                      setSelectedCategoryForSheet(cat);
+                      setShowSubcategorySheet(true);
+                    } else {
+                      setActiveCategory(cat); 
+                      setActiveSubcategory('');
+                    }
+                  }
+                }}
                 className="rounded-full px-4 glass-nav-item"
               >
                 {cat}
               </Button>
-            </motion.div>
-            {cat !== 'All' && (SUBCATEGORIES[cat] || []).length > 0 && (
-              <div className={`absolute ${isLastTwo ? 'right-0' : 'left-0'} top-full pt-1 z-20 opacity-0 invisible group-hover/category:opacity-100 group-hover/category:visible transition-all duration-200`}>
-                <div className={`rounded-xl border bg-card shadow-xl p-4 w-auto ${
-                  (SUBCATEGORIES[cat] || []).length > 6 
-                    ? 'grid grid-cols-2 gap-x-4 gap-y-2 min-w-[360px]' 
-                    : 'flex flex-col gap-2 min-w-[220px]'
-                }`}>
-                  <div className={`text-xs text-muted-foreground mb-2 px-1 ${
-                    (SUBCATEGORIES[cat] || []).length > 6 ? 'col-span-2' : ''
+              
+              {/* Desktop hover dropdown */}
+              {cat !== 'All' && (SUBCATEGORIES[cat] || []).length > 0 && (
+                <div 
+                  className={`hidden md:block absolute ${isLastTwo ? 'right-0' : 'left-0'} top-full pt-1 z-50 opacity-0 invisible group-hover/category:opacity-100 group-hover/category:visible transition-all duration-200`}
+                  onMouseLeave={() => setOpenDropdown(null)}
+                >
+                  <div className={`rounded-xl border border-border bg-white shadow-2xl p-4 w-auto ${
+                    (SUBCATEGORIES[cat] || []).length > 6 
+                      ? 'grid grid-cols-2 gap-x-4 gap-y-2 min-w-[360px]' 
+                      : 'flex flex-col gap-2 min-w-[220px]'
                   }`}>
-                    Subcategories
+                    <div className={`text-xs font-semibold text-foreground/70 mb-2 px-1 ${
+                      (SUBCATEGORIES[cat] || []).length > 6 ? 'col-span-2' : ''
+                    }`}>
+                      Subcategories
+                    </div>
+                    {(SUBCATEGORIES[cat] || []).map(sc => (
+                      <button
+                        key={sc}
+                        onClick={() => { 
+                          setActiveCategory(cat); 
+                          setActiveSubcategory(sc);
+                          setOpenDropdown(null);
+                        }}
+                        className={`text-left px-3 py-2 rounded-md transition-colors whitespace-nowrap text-sm ${
+                          activeSubcategory === sc && activeCategory === cat 
+                            ? 'bg-secondary text-secondary-foreground font-medium' 
+                            : 'hover:bg-muted/80'
+                        }`}
+                      >
+                        {toTitleCase(sc)}
+                      </button>
+                    ))}
                   </div>
-                  {(SUBCATEGORIES[cat] || []).map(sc => (
-                    <button
-                      key={sc}
-                      onClick={() => { setActiveCategory(cat); setActiveSubcategory(sc); }}
-                      className={`text-left px-3 py-2 rounded-md transition-colors whitespace-nowrap text-sm ${
-                        activeSubcategory === sc && activeCategory === cat 
-                          ? 'bg-secondary text-secondary-foreground font-medium' 
-                          : 'hover:bg-muted'
-                      }`}
-                    >
-                      {toTitleCase(sc)}
-                    </button>
-                  ))}
                 </div>
-              </div>
-            )}
-          </motion.div>
-        );
-      })}
-    </motion.div>
+              )}
+            </motion.div>
+          );
+        })}
+      </motion.div>
+
+      {/* Mobile subcategory sheet */}
+      <Sheet open={showSubcategorySheet} onOpenChange={setShowSubcategorySheet}>
+        <SheetContent side="bottom" className="h-[60vh]">
+          <SheetHeader>
+            <SheetTitle>{selectedCategoryForSheet} - Select Subcategory</SheetTitle>
+          </SheetHeader>
+          <div className="mt-6 grid grid-cols-2 gap-3 overflow-auto scrollbar-thin pb-24">
+            {/* "All" option to view entire category */}
+            <Button
+              variant={activeCategory === selectedCategoryForSheet && !activeSubcategory ? 'secondary' : 'outline'}
+              onClick={() => {
+                setActiveCategory(selectedCategoryForSheet);
+                setActiveSubcategory('');
+                setShowSubcategorySheet(false);
+              }}
+              className="h-auto py-3 text-left justify-start font-semibold col-span-2"
+            >
+              All {selectedCategoryForSheet}
+            </Button>
+            
+            {(SUBCATEGORIES[selectedCategoryForSheet] || []).map(sc => (
+              <Button
+                key={sc}
+                variant={activeSubcategory === sc && activeCategory === selectedCategoryForSheet ? 'secondary' : 'outline'}
+                onClick={() => {
+                  setActiveCategory(selectedCategoryForSheet);
+                  setActiveSubcategory(sc);
+                  setShowSubcategorySheet(false);
+                }}
+                className="h-auto py-3 text-left justify-start"
+              >
+                {toTitleCase(sc)}
+              </Button>
+            ))}
+          </div>
+        </SheetContent>
+      </Sheet>
+    </>
   );
 
   const ListRow = ({ row, index }: { row: any; index: number }) => (
-    <motion.div
-      initial="hidden"
-      animate="visible"
-      variants={fadeInUp}
-      transition={{ delay: index * 0.05, ...springTransition }}
-    >
+    <div>
       <Link
         to={`/product/${row.id}`}
         className="group relative grid grid-cols-[1fr,auto] md:grid-cols-[3fr,1fr,1fr,2fr,2fr] gap-4 p-4 rounded-2xl border bg-card glass-card shadow-sm transition-all duration-300 hover:shadow-xl hover:shadow-primary/10"
@@ -221,7 +278,7 @@ export default function LiveOffers() {
         {row.restricted ? row.restricted : 'No'}
       </div>
     </Link>
-    </motion.div>
+    </div>
   );
 
   // Grid uses MarketplaceCard
@@ -297,11 +354,9 @@ export default function LiveOffers() {
           <div>Market Restrictions</div>
         </div>
         <div className="grid gap-3">
-          <AnimatePresence mode="popLayout">
-            {items.map((row, index) => (
-              <ListRow key={row.id} row={row} index={index} />
-            ))}
-          </AnimatePresence>
+          {items.map((row, index) => (
+            <ListRow key={row.id} row={row} index={index} />
+          ))}
         </div>
       </motion.div>
     );
@@ -316,38 +371,100 @@ export default function LiveOffers() {
     <div className="container py-4 md:py-8 px-4 space-y-4 md:space-y-6 overflow-visible min-h-screen">
       <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
         <h1 className="text-2xl md:text-3xl font-display font-semibold">Marketplace</h1>
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex items-center gap-2">
+          {/* Mobile: Use Sheet for Sort */}
+          <Sheet>
+            <SheetTrigger asChild className="md:hidden">
+              <Button variant="outline" size="sm" className="gap-2 flex-1">
+                <ChevronDown className="h-4 w-4" /> 
+                <span>Sort</span>
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="bottom" className="h-auto">
+              <SheetHeader>
+                <SheetTitle>Sort By</SheetTitle>
+              </SheetHeader>
+              <div className="mt-6 grid gap-2 pb-24">
+                <Button
+                  variant={sortKey === 'price_asc' ? 'secondary' : 'outline'}
+                  onClick={() => setSortKey('price_asc')}
+                  className="justify-start"
+                >
+                  Price: Low to High
+                </Button>
+                <Button
+                  variant={sortKey === 'price_desc' ? 'secondary' : 'outline'}
+                  onClick={() => setSortKey('price_desc')}
+                  className="justify-start"
+                >
+                  Price: High to Low
+                </Button>
+                <Button
+                  variant={sortKey === 'qty_asc' ? 'secondary' : 'outline'}
+                  onClick={() => setSortKey('qty_asc')}
+                  className="justify-start"
+                >
+                  Quantity: Low to High
+                </Button>
+                <Button
+                  variant={sortKey === 'qty_desc' ? 'secondary' : 'outline'}
+                  onClick={() => setSortKey('qty_desc')}
+                  className="justify-start"
+                >
+                  Quantity: High to Low
+                </Button>
+                <Button
+                  variant={sortKey === 'name_asc' ? 'secondary' : 'outline'}
+                  onClick={() => setSortKey('name_asc')}
+                  className="justify-start"
+                >
+                  Name: A-Z
+                </Button>
+                <Button
+                  variant={sortKey === 'name_desc' ? 'secondary' : 'outline'}
+                  onClick={() => setSortKey('name_desc')}
+                  className="justify-start"
+                >
+                  Name: Z-A
+                </Button>
+              </div>
+            </SheetContent>
+          </Sheet>
+
+          {/* Desktop: Use DropdownMenu for Sort */}
           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
+            <DropdownMenuTrigger asChild className="hidden md:flex">
               <Button variant="outline" size="sm" className="gap-2">
-                <ChevronDown className="h-4 w-4" /> <span className="hidden sm:inline">Sort by</span>
+                <ChevronDown className="h-4 w-4" /> 
+                <span>Sort</span>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => setSortKey('price_asc')}>Price min</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setSortKey('price_desc')}>Price max</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setSortKey('qty_asc')}>Quantity min</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setSortKey('qty_desc')}>Quantity max</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setSortKey('name_asc')}>Name A-Z</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setSortKey('name_desc')}>Name Z-A</DropdownMenuItem>
+            <DropdownMenuContent align="start" className="w-48">
+              <DropdownMenuItem onClick={() => setSortKey('price_asc')}>Price: Low to High</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setSortKey('price_desc')}>Price: High to Low</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setSortKey('qty_asc')}>Quantity: Low to High</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setSortKey('qty_desc')}>Quantity: High to Low</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setSortKey('name_asc')}>Name: A-Z</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setSortKey('name_desc')}>Name: Z-A</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
 
           <Sheet open={showFilters} onOpenChange={setShowFilters}>
             <SheetTrigger asChild>
-              <Button variant="outline" size="sm" className="gap-2">
-                <SlidersHorizontal className="h-4 w-4" /> <span className="hidden sm:inline">Filter by</span>
+              <Button variant="outline" size="sm" className="gap-2 flex-1 md:flex-none">
+                <SlidersHorizontal className="h-4 w-4" /> 
+                <span>Filter</span>
                 {appliedFiltersCount > 0 && (
                   <Badge className="ml-1 bg-primary/15 text-primary border-primary/30 text-xs">{appliedFiltersCount}</Badge>
                 )}
               </Button>
             </SheetTrigger>
-            <SheetContent side="right" className="w-[360px] sm:w-[420px] glass-light">
+            <SheetContent side="right" className="w-[85vw] sm:w-[420px] glass-light">
               <SheetHeader>
                 <SheetTitle>Filters</SheetTitle>
               </SheetHeader>
 
-              <div className="mt-4 space-y-6 overflow-auto scrollbar-thin">
+              <div className="mt-4 space-y-6 overflow-auto scrollbar-thin max-h-[70vh]">
                 <div>
                   <div className="font-medium mb-2">Category</div>
                   <div className="space-y-2">
@@ -401,34 +518,18 @@ export default function LiveOffers() {
             </SheetContent>
           </Sheet>
 
-          <Button variant="outline" size="sm" className="gap-2 hidden sm:flex">
-            <Download className="h-4 w-4" /> <span className="hidden md:inline">DOWNLOAD MARKETPLACE</span>
+          <Button variant="outline" size="sm" className="gap-2 hidden md:flex">
+            <Download className="h-4 w-4" /> <span>Download</span>
           </Button>
 
-          <motion.div
-            className="flex gap-1 border rounded-md p-1 glass-nav-item"
-            whileHover={{ scale: 1.02 }}
-            transition={springTransition}
-          >
-            <motion.div
-              whileHover={hoverScale}
-              whileTap={tapScale}
-              transition={springTransition}
-            >
-              <Button variant={viewMode === "list" ? "secondary" : "ghost"} size="sm" onClick={() => setViewMode("list")}>
-                <LayoutList className="h-4 w-4" />
-              </Button>
-            </motion.div>
-            <motion.div
-              whileHover={hoverScale}
-              whileTap={tapScale}
-              transition={springTransition}
-            >
-              <Button variant={viewMode === "grid" ? "secondary" : "ghost"} size="sm" onClick={() => setViewMode("grid")}>
-                <LayoutGrid className="h-4 w-4" />
-              </Button>
-            </motion.div>
-          </motion.div>
+          <div className="flex gap-1 border rounded-md p-1 glass-nav-item">
+            <Button variant={viewMode === "list" ? "secondary" : "ghost"} size="sm" onClick={() => setViewMode("list")}>
+              <LayoutList className="h-4 w-4" />
+            </Button>
+            <Button variant={viewMode === "grid" ? "secondary" : "ghost"} size="sm" onClick={() => setViewMode("grid")}>
+              <LayoutGrid className="h-4 w-4" />
+            </Button>
+          </div>
         </div>
       </div>
 

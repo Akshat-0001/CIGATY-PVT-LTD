@@ -221,12 +221,13 @@ export default function Product() {
           <div className="text-sm">Pack: {listing.packaging === "case" && listing.bottles_per_case ? `${listing.bottles_per_case}x` : ""}{listing.content || "—"}</div>
           <div className="text-sm">Duty: {listing.duty === 'under_bond' ? 'Under Bond' : 'Duty Paid'}</div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="rounded-xl border bg-card glass-card p-5 sticky top-24"
-          >
+          <div className="lg:sticky lg:top-24 space-y-4">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="rounded-xl border bg-card glass-card p-5"
+            >
             <motion.div
               initial={{ scale: 0.9 }}
               animate={{ scale: 1 }}
@@ -265,13 +266,6 @@ export default function Product() {
             )}
           </motion.div>
 
-          <ReserveModal 
-            open={reserveModalOpen} 
-            onOpenChange={setReserveModalOpen} 
-            listing={listing}
-            seller={seller}
-          />
-
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -303,6 +297,14 @@ export default function Product() {
               Contact on WhatsApp
             </Button>
           </motion.div>
+          </div>
+
+          <ReserveModal 
+            open={reserveModalOpen} 
+            onOpenChange={setReserveModalOpen} 
+            listing={listing}
+            seller={seller}
+          />
         </motion.div>
       </motion.div>
 

@@ -127,7 +127,8 @@ const Contact = () => {
                   <a
                     key={info.title}
                     href={info.link}
-                    className="bg-card rounded-lg p-6 border text-center hover:border-primary/50 transition-colors"
+                    className="bg-white dark:bg-slate-900 rounded-lg p-6 border border-slate-200 dark:border-slate-800 text-center"
+                    style={{ transition: 'none', transform: 'none' }}
                   >
                     <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-3">
                       <Icon className="w-6 h-6 text-primary" />
@@ -273,7 +274,7 @@ const Contact = () => {
 
               {/* Additional Info Sidebar */}
               <div className="space-y-6">
-                <div className="bg-card rounded-lg p-6 border">
+                <div className="bg-white dark:bg-slate-900 rounded-lg p-6 border border-slate-200 dark:border-slate-800" style={{ transition: 'none', transform: 'none' }}>
                   <h3 className="text-lg font-bold text-foreground mb-3">Business Hours</h3>
                   <div className="space-y-1 text-sm text-muted-foreground">
                     <p>Sunday - Thursday: 9:00 AM - 6:00 PM GST</p>
@@ -282,7 +283,7 @@ const Contact = () => {
                   </div>
                 </div>
 
-                <div className="bg-card rounded-lg p-6 border">
+                <div className="bg-white dark:bg-slate-900 rounded-lg p-6 border border-slate-200 dark:border-slate-800" style={{ transition: 'none', transform: 'none' }}>
                   <h3 className="text-lg font-bold text-foreground mb-3">Support</h3>
                   <p className="text-sm text-muted-foreground mb-3">
                     For urgent matters or technical support:
@@ -296,7 +297,7 @@ const Contact = () => {
                   </a>
                 </div>
 
-                <div className="bg-card rounded-lg p-6 border">
+                <div className="bg-white dark:bg-slate-900 rounded-lg p-6 border border-slate-200 dark:border-slate-800" style={{ transition: 'none', transform: 'none' }}>
                   <h3 className="text-lg font-bold text-foreground mb-3">Quick Links</h3>
                   <p className="text-sm text-muted-foreground mb-3">
                     Check out our FAQ section:

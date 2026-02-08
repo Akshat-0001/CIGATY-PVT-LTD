@@ -834,7 +834,7 @@ All colors MUST be HSL.
   /* Smooth Scroll Behavior - Disabled on mobile for better performance */
   @media (min-width: 769px) {
     html {
-      scroll-behavior: smooth;
+      scroll-behavior: auto;
     }
   }
   
@@ -845,14 +845,7 @@ All colors MUST be HSL.
     }
   }
 
-  /* Performance Optimizations */
-  .will-change-transform {
-    will-change: transform;
-  }
-
-  .will-change-opacity {
-    will-change: opacity;
-  }
+  /* Performance Optimizations - Removed will-change for better performance */
 
   /* Reduced Motion Support */
   @media (prefers-reduced-motion: reduce) {
@@ -1060,3 +1053,68 @@ All colors MUST be HSL.
     }
   }
 }
+
+/* AGGRESSIVE PERFORMANCE FIX: Remove ALL heavy effects */
+* {
+  scroll-behavior: auto !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+html, body {
+  scroll-behavior: auto !important;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Disable ALL glass effects - they cause lag */
+.glass-card, .glass-nav-item, .glass-button, .glass-input, .glass-light, 
+[class*="glass"], .header-glass-dark, .card-elevate {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background: hsl(var(--card)) !important;
+  transition: none !important;
+  transform: none !important;
+  will-change: auto !important;
+  animation: none !important;
+}
+
+/* Remove all hover effects */
+*:hover {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  transition: none !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Disable all transitions and animations globally */
+*, *::before, *::after {
+  transition: none !important;
+  animation: none !important;
+  will-change: auto !important;
+}
+
+/* Simple card styling without effects */
+.bg-card {
+  background: hsl(var(--card)) !important;
+  border: 1px solid hsl(var(--border)) !important;
+}
+
+/* Optimize rendering with containment */
+.container, section {
+  contain: layout;
+}
+
+div[class*="grid"], div[class*="flex"] {
+  contain: layout style;
+}
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  * {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    transform: none !important;
+  }
+}
+

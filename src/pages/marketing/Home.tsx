@@ -102,7 +102,8 @@ const Home = () => {
               return (
                 <div
                   key={feature.title}
-                  className="bg-card rounded-lg p-6 border hover:border-primary/50 transition-colors"
+                  className="bg-white dark:bg-slate-900 rounded-lg p-6 border border-slate-200 dark:border-slate-800"
+                  style={{ transition: 'none', transform: 'none', willChange: 'auto' }}
                 >
                   <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
                     <Icon className="w-6 h-6 text-primary" />
