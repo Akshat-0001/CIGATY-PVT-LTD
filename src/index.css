@@ -993,10 +993,9 @@ All colors MUST be HSL.
       will-change: auto;
     }
     
-    /* Optimize scroll performance */
+    /* Optimize scroll performance - ALLOW native pull-to-refresh */
     * {
       -webkit-overflow-scrolling: touch;
-      overscroll-behavior: contain;
     }
     
     /* Prevent scroll jank */
@@ -1025,13 +1024,12 @@ All colors MUST be HSL.
     -webkit-perspective: 1000px;
   }
   
-  /* Optimize scroll containers */
+  /* Optimize scroll containers - ALLOW native pull-to-refresh */
   .container,
   main,
   [role="main"] {
     contain: layout style paint;
     -webkit-overflow-scrolling: touch;
-    overscroll-behavior-y: contain;
   }
   
   /* Optimize list containers for smooth scrolling */
