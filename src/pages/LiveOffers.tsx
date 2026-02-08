@@ -165,9 +165,6 @@ export default function LiveOffers() {
                 </div>
               </div>
             )}
-                </div>
-              </div>
-            )}
           </motion.div>
         );
       })}
