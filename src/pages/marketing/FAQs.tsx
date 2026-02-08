@@ -48,8 +48,7 @@ const FAQs = () => {
             {faqs.map((faq, index) => (
               <div
                 key={index}
-                className="bg-white dark:bg-slate-900 rounded-lg border border-slate-200 dark:border-slate-800 overflow-hidden"
-                style={{ transition: 'none', transform: 'none' }}
+                className="bg-card rounded-lg border overflow-hidden"
               >
                 <button
                   onClick={() => setOpenIndex(openIndex === index ? null : index)}
