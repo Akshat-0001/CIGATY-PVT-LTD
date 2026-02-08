@@ -145,7 +145,7 @@ export default function LiveOffers() {
               <div className={`absolute ${isLastTwo ? 'right-0' : 'left-0'} top-full pt-1 z-20 opacity-0 invisible group-hover/category:opacity-100 group-hover/category:visible transition-all duration-200`}>
                 <div className="w-64 rounded-xl border bg-card shadow-xl p-3">
                   <div className="text-xs text-muted-foreground mb-2 px-1">Subcategories</div>
-                  <div className="grid grid-cols-1 gap-1 max-h-[300px] overflow-y-auto scrollbar-thin scrollbar-thumb-primary/20 scrollbar-track-transparent hover:scrollbar-thumb-primary/40">
+                  <div className="grid grid-cols-1 gap-1 max-h-[300px] overflow-y-auto scrollbar-thin">
                     {(SUBCATEGORIES[cat] || []).map(sc => (
                       <button
                         key={sc}
@@ -337,7 +337,7 @@ export default function LiveOffers() {
                 <SheetTitle>Filters</SheetTitle>
               </SheetHeader>
 
-              <div className="mt-4 space-y-6 overflow-auto">
+              <div className="mt-4 space-y-6 overflow-auto scrollbar-thin">
                 <div>
                   <div className="font-medium mb-2">Category</div>
                   <div className="space-y-2">
@@ -355,7 +355,7 @@ export default function LiveOffers() {
 
                 <div>
                   <div className="font-medium mb-2">Warehouse</div>
-                  <div className="space-y-2 max-h-56 overflow-auto pr-2">
+                  <div className="space-y-2 max-h-56 overflow-auto scrollbar-thin pr-2">
                     {(warehouses || []).map((w: any) => (
                       <label key={w.id} className="flex items-center gap-2">
                         <Checkbox
@@ -370,7 +370,7 @@ export default function LiveOffers() {
 
                 <div>
                   <div className="font-medium mb-2">Content</div>
-                  <div className="grid grid-cols-2 gap-2 max-h-56 overflow-auto pr-2">
+                  <div className="grid grid-cols-2 gap-2 max-h-56 overflow-auto scrollbar-thin pr-2">
                     {CONTENT_LIST.map((v) => (
                       <label key={v} className="flex items-center gap-2">
                         <Checkbox

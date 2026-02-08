@@ -187,7 +187,7 @@ export function ReserveModal({ open, onOpenChange, listing, seller }: ReserveMod
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto p-0 gap-0">
+      <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto scrollbar-thin p-0 gap-0">
         {/* Header Section */}
         <div className="flex items-center justify-between border-b px-6 py-4 bg-muted/30">
           <div>
