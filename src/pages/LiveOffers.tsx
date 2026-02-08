@@ -145,12 +145,12 @@ export default function LiveOffers() {
               <div className={`absolute ${isLastTwo ? 'right-0' : 'left-0'} top-full pt-1 z-20 opacity-0 invisible group-hover/category:opacity-100 group-hover/category:visible transition-all duration-200`}>
                 <div className="min-w-[240px] max-w-[320px] w-max rounded-xl border bg-card shadow-xl p-3 pb-2">
                   <div className="text-xs text-muted-foreground mb-2 px-1">Subcategories</div>
-                  <div className="grid grid-cols-1 gap-1 max-h-[250px] overflow-y-scroll scrollbar-thin pr-1">
+                  <div className="grid grid-cols-1 gap-0.5 max-h-[300px] overflow-y-scroll scrollbar-thin pr-1">
                     {(SUBCATEGORIES[cat] || []).map(sc => (
                       <button
                         key={sc}
                         onClick={() => { setActiveCategory(cat); setActiveSubcategory(sc); }}
-                        className={`text-left px-3 py-2 rounded-md hover:bg-muted transition-colors whitespace-nowrap text-sm ${activeSubcategory === sc && activeCategory === cat ? 'bg-muted' : ''}`}
+                        className={`text-left px-3 py-1.5 rounded-md hover:bg-muted transition-colors whitespace-nowrap text-sm ${activeSubcategory === sc && activeCategory === cat ? 'bg-muted' : ''}`}
                       >
                         {toTitleCase(sc)}
                       </button>
