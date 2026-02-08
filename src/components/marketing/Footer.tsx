@@ -56,9 +56,9 @@ export const MarketingFooter = () => {
             Cigaty connects verified importers, distributors, and traders in one trusted digital marketplace.
             </p>
             <div className="space-y-3">
-              <a href="mailto:director@cigaty.com" className="flex items-center text-muted-foreground hover:text-primary transition-colors">
+              <a href="mailto:info@cigaty.com" className="flex items-center text-muted-foreground hover:text-primary transition-colors">
                 <Mail className="w-5 h-5 mr-3" />
-                director@cigaty.com
+                info@cigaty.com
               </a>
               <a href="tel:+1234567890" className="flex items-center text-muted-foreground hover:text-primary transition-colors">
                 <Phone className="w-5 h-5 mr-3" />

@@ -24,8 +24,8 @@ const Contact = () => {
     {
       icon: Mail,
       title: 'Email',
-      details: 'director@cigaty.com',
-      link: 'mailto:director@cigaty.com',
+      details: 'info@cigaty.com',
+      link: 'mailto:info@cigaty.com',
     },
     {
       icon: Phone,
