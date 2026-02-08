@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { Mail, Phone, MapPin, Send, CheckCircle, Globe2, Clock, Loader2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -115,12 +114,7 @@ const Contact = () => {
         </div>
 
         <div className="container mx-auto px-4 relative z-10">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="max-w-4xl mx-auto text-center"
-          >
+          <div className="max-w-4xl mx-auto text-center">
             <h1 className="text-5xl md:text-6xl font-bold text-foreground mb-6">
               Get in <span className="text-gradient-primary">Touch</span>
             </h1>
@@ -128,7 +122,7 @@ const Contact = () => {
               Have questions? We'd love to hear from you. Send us a message and 
               we'll respond as soon as possible.
             </p>
-          </motion.div>
+          </div>
         </div>
       </section>
 
@@ -142,21 +136,17 @@ const Contact = () => {
             {contactInfo.map((info, index) => {
               const Icon = info.icon;
               return (
-                <motion.a
+                <a
                   key={info.title}
                   href={info.link}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.8 + index * 0.15, duration: 0.6 }}
-                  whileHover={{ y: -8 }}
-                  className="card text-center group cursor-pointer"
+                  className="card text-center group cursor-pointer hover:-translate-y-2 transition-transform"
                 >
                   <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center group-hover:scale-110 transition-transform">
                     <Icon className="w-8 h-8 text-primary" />
                   </div>
                   <h3 className="text-xl font-semibold text-foreground mb-2">{info.title}</h3>
                   <p className="text-muted-foreground">{info.details}</p>
-                </motion.a>
+                </a>
               );
             })}
           </div>
@@ -172,27 +162,17 @@ const Contact = () => {
           <div className="max-w-4xl mx-auto">
             <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 md:gap-12">
               {/* Form */}
-              <motion.div
-                initial={{ opacity: 0, x: -30 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: false, amount: 0.2 }}
-                transition={{ duration: 0.6 }}
-                className="lg:col-span-3"
-              >
+              <div className="lg:col-span-3">
                 <h2 className="text-2xl sm:text-3xl font-bold text-foreground mb-4 md:mb-6">Send us a Message</h2>
                 
                 {isSubmitted ? (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className="bg-gradient-to-br from-primary to-secondary rounded-xl p-8 text-center"
-                  >
+                  <div className="bg-gradient-to-br from-primary to-secondary rounded-xl p-8 text-center">
                     <CheckCircle className="w-16 h-16 text-primary mx-auto mb-4" />
                     <h3 className="text-2xl font-bold text-foreground mb-2">Thank You!</h3>
                     <p className="text-foreground">
                       Your message has been sent successfully. We'll get back to you soon.
                     </p>
-                  </motion.div>
+                  </div>
                 ) : (
                   <form onSubmit={handleSubmit} className="space-y-4 md:space-y-6">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
@@ -315,16 +295,10 @@ const Contact = () => {
                     </Button>
                   </form>
                 )}
-              </motion.div>
+              </div>
 
               {/* Additional Info */}
-              <motion.div
-                initial={{ opacity: 0, x: 30 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: false, amount: 0.2 }}
-                transition={{ duration: 0.6 }}
-                className="lg:col-span-2 space-y-8"
-              >
+              <div className="lg:col-span-2 space-y-8">
                 <div>
                   <h3 className="text-xl sm:text-2xl font-bold text-foreground mb-3 md:mb-4">Business Hours</h3>
                   <div className="space-y-2 text-sm md:text-base text-muted-foreground">
@@ -371,7 +345,7 @@ const Contact = () => {
                     Visit FAQ →
                   </Link>
                 </div>
-              </motion.div>
+              </div>
             </div>
           </div>
         </div>
@@ -389,28 +363,16 @@ const Contact = () => {
         </div>
 
         <div className="container mx-auto px-4 relative z-10">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: false, amount: 0.3 }}
-            transition={{ duration: 0.6 }}
-            className="text-center mb-8 md:mb-12"
-          >
+          <div className="text-center mb-8 md:mb-12">
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-foreground mb-3 md:mb-4">
               Our <span className="text-gradient-primary">Headquarters</span>
             </h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
               Visit our office at the heart of Dubai's business district
             </p>
-          </motion.div>
+          </div>
 
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: false, amount: 0.2 }}
-            transition={{ duration: 0.6 }}
-            className="relative max-w-6xl mx-auto"
-          >
+          <div className="relative max-w-6xl mx-auto">
             {/* Map container with decorative frame */}
             <div className="relative group">
               {/* Glow effect */}
@@ -433,13 +395,7 @@ const Contact = () => {
                   />
                   
                   {/* Custom overlay info card */}
-                  <motion.div
-                    initial={{ opacity: 0, x: -50 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: false }}
-                    transition={{ delay: 0.5, duration: 0.6 }}
-                    className="absolute top-6 left-6 glass-effect border border-primary/30 rounded-2xl p-6 max-w-xs backdrop-blur-xl shadow-2xl"
-                  >
+                  <div className="absolute top-6 left-6 glass-effect border border-primary/30 rounded-2xl p-6 max-w-xs backdrop-blur-xl shadow-2xl">
                     <div className="flex items-start gap-4">
                       <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-primary to-secondary flex items-center justify-center flex-shrink-0 shadow-lg">
                         <MapPin className="w-7 h-7 text-white" strokeWidth={2.5} />
@@ -452,19 +408,13 @@ const Contact = () => {
                         </p>
                       </div>
                     </div>
-                  </motion.div>
+                  </div>
                 </div>
               </div>
             </div>
 
             {/* Location details below map */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: false }}
-              transition={{ delay: 0.7, duration: 0.6 }}
-              className="grid md:grid-cols-3 gap-6 mt-8"
-            >
+            <div className="grid md:grid-cols-3 gap-6 mt-8">
               <div className="glass-effect border border-primary/20 rounded-2xl p-6 text-center hover:border-primary/40 transition-all">
                 <MapPin className="w-10 h-10 text-primary mx-auto mb-3" />
                 <h4 className="text-lg font-semibold text-foreground mb-2">Address</h4>
@@ -491,8 +441,8 @@ const Contact = () => {
                   9:00 AM - 6:00 PM GST
                 </p>
               </div>
-            </motion.div>
-          </motion.div>
+            </div>
+          </div>
         </div>
       </section>
     </div>
