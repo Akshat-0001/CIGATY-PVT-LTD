@@ -143,9 +143,9 @@ export default function LiveOffers() {
             </motion.div>
             {cat !== 'All' && (SUBCATEGORIES[cat] || []).length > 0 && (
               <div className={`absolute ${isLastTwo ? 'right-0' : 'left-0'} top-full pt-1 z-20 opacity-0 invisible group-hover/category:opacity-100 group-hover/category:visible transition-all duration-200`}>
-                <div className="min-w-[240px] max-w-[320px] w-max rounded-xl border bg-card shadow-xl p-3 pb-2">
-                  <div className="text-xs text-muted-foreground mb-2 px-1">Subcategories</div>
-                  <div className="grid grid-cols-1 gap-0.5 max-h-[300px] overflow-y-scroll scrollbar-thin pr-1">
+                <div className="min-w-[240px] max-w-[320px] w-max rounded-xl border bg-card shadow-xl overflow-hidden">
+                  <div className="text-xs text-muted-foreground mb-2 px-4 pt-3">Subcategories</div>
+                  <div className="grid grid-cols-1 gap-0.5 max-h-[300px] overflow-y-scroll scrollbar-thin px-3 pb-3">
                     {(SUBCATEGORIES[cat] || []).map(sc => (
                       <button
                         key={sc}
@@ -156,6 +156,11 @@ export default function LiveOffers() {
                       </button>
                     ))}
                   </div>
+                  {(SUBCATEGORIES[cat] || []).length > 6 && (
+                    <div className="text-xs text-center text-muted-foreground py-1 bg-muted/30 border-t">
+                      Scroll for more ↓
+                    </div>
+                  )}
                 </div>
               </div>
             )}
