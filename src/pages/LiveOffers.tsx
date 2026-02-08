@@ -117,46 +117,51 @@ export default function LiveOffers() {
       animate="visible"
       variants={staggerContainer}
     >
-      {['All','Beer','Wine','Spirits','Champagne','Other'].map((cat, index) => (
-        <motion.div
-          key={cat}
-          variants={fadeInUp}
-          className="relative group/category"
-        >
+      {['All','Beer','Wine','Spirits','Champagne','Other'].map((cat, index) => {
+        const categories = ['All','Beer','Wine','Spirits','Champagne','Other'];
+        const isLastTwo = index >= categories.length - 2; // Last two items
+        
+        return (
           <motion.div
-            whileHover={hoverScale}
-            whileTap={tapScale}
-            transition={springTransition}
+            key={cat}
+            variants={fadeInUp}
+            className="relative group/category"
           >
-            <Button
-              size="sm"
-              variant={activeCategory === cat ? 'secondary' : 'ghost'}
-              onClick={() => { setActiveCategory(cat); setActiveSubcategory(''); }}
-              className="rounded-full px-4 glass-nav-item"
+            <motion.div
+              whileHover={hoverScale}
+              whileTap={tapScale}
+              transition={springTransition}
             >
-              {cat}
-            </Button>
-          </motion.div>
-          {cat !== 'All' && (SUBCATEGORIES[cat] || []).length > 0 && (
-            <div className="absolute left-0 top-full pt-1 z-20 opacity-0 invisible group-hover/category:opacity-100 group-hover/category:visible transition-all duration-200">
-              <div className="w-64 rounded-xl border bg-card shadow-xl p-3">
-                <div className="text-xs text-muted-foreground mb-2 px-1">Subcategories</div>
-                <div className="grid grid-cols-1 gap-1">
-                  {(SUBCATEGORIES[cat] || []).map(sc => (
-                    <button
-                      key={sc}
-                      onClick={() => { setActiveCategory(cat); setActiveSubcategory(sc); }}
-                      className={`text-left px-2 py-1 rounded-md hover:bg-muted transition-colors ${activeSubcategory === sc && activeCategory === cat ? 'bg-muted' : ''}`}
-                    >
-                      {toTitleCase(sc)}
-                    </button>
-                  ))}
+              <Button
+                size="sm"
+                variant={activeCategory === cat ? 'secondary' : 'ghost'}
+                onClick={() => { setActiveCategory(cat); setActiveSubcategory(''); }}
+                className="rounded-full px-4 glass-nav-item"
+              >
+                {cat}
+              </Button>
+            </motion.div>
+            {cat !== 'All' && (SUBCATEGORIES[cat] || []).length > 0 && (
+              <div className={`absolute ${isLastTwo ? 'right-0' : 'left-0'} top-full pt-1 z-20 opacity-0 invisible group-hover/category:opacity-100 group-hover/category:visible transition-all duration-200`}>
+                <div className="w-64 rounded-xl border bg-card shadow-xl p-3">
+                  <div className="text-xs text-muted-foreground mb-2 px-1">Subcategories</div>
+                  <div className="grid grid-cols-1 gap-1">
+                    {(SUBCATEGORIES[cat] || []).map(sc => (
+                      <button
+                        key={sc}
+                        onClick={() => { setActiveCategory(cat); setActiveSubcategory(sc); }}
+                        className={`text-left px-2 py-1 rounded-md hover:bg-muted transition-colors ${activeSubcategory === sc && activeCategory === cat ? 'bg-muted' : ''}`}
+                      >
+                        {toTitleCase(sc)}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
-        </motion.div>
-      ))}
+            )}
+          </motion.div>
+        );
+      })}
     </motion.div>
   );
 
