@@ -143,12 +143,12 @@ export default function LiveOffers() {
             </motion.div>
             {cat !== 'All' && (SUBCATEGORIES[cat] || []).length > 0 && (
               <div className={`absolute ${isLastTwo ? 'right-0' : 'left-0'} top-full pt-1 z-20 opacity-0 invisible group-hover/category:opacity-100 group-hover/category:visible transition-all duration-200`}>
-                <div className={`rounded-xl border bg-card shadow-xl p-4 ${
+                <div className={`rounded-xl border bg-card shadow-xl p-4 pb-4 ${
                   (SUBCATEGORIES[cat] || []).length > 6 
-                    ? 'grid grid-cols-2 gap-x-3 gap-y-1 min-w-[320px] max-w-[400px]' 
-                    : 'flex flex-col gap-1 min-w-[200px] max-w-[280px]'
+                    ? 'grid grid-cols-2 gap-x-3 gap-y-1.5 min-w-[320px] max-w-[400px]' 
+                    : 'flex flex-col gap-1.5 min-w-[200px] max-w-[280px]'
                 }`}>
-                  <div className={`text-xs text-muted-foreground mb-2 px-1 ${
+                  <div className={`text-xs text-muted-foreground mb-3 px-1 ${
                     (SUBCATEGORIES[cat] || []).length > 6 ? 'col-span-2' : ''
                   }`}>
                     Subcategories
@@ -157,7 +157,7 @@ export default function LiveOffers() {
                     <button
                       key={sc}
                       onClick={() => { setActiveCategory(cat); setActiveSubcategory(sc); }}
-                      className={`text-left px-3 py-1.5 rounded-md hover:bg-muted transition-colors whitespace-nowrap text-sm ${activeSubcategory === sc && activeCategory === cat ? 'bg-muted' : ''}`}
+                      className={`text-left px-3 py-2 rounded-md hover:bg-muted transition-colors whitespace-nowrap text-sm ${activeSubcategory === sc && activeCategory === cat ? 'bg-muted' : ''}`}
                     >
                       {toTitleCase(sc)}
                     </button>
