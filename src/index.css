@@ -284,16 +284,16 @@ All colors MUST be HSL.
 @layer base {
   /* Thin scrollbar for webkit browsers (Chrome, Safari, Edge) */
   ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+    width: 8px;
+    height: 8px;
   }
   ::-webkit-scrollbar-track {
     background: hsl(var(--muted) / 0.3);
-    border-radius: 3px;
+    border-radius: 4px;
   }
   ::-webkit-scrollbar-thumb {
     background: hsl(var(--primary) / 0.5);
-    border-radius: 3px;
+    border-radius: 4px;
   }
   ::-webkit-scrollbar-thumb:hover {
     background: hsl(var(--primary) / 0.7);
