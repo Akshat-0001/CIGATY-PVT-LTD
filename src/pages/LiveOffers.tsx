@@ -145,7 +145,7 @@ export default function LiveOffers() {
               <div className={`absolute ${isLastTwo ? 'right-0' : 'left-0'} top-full pt-1 z-20 opacity-0 invisible group-hover/category:opacity-100 group-hover/category:visible transition-all duration-200`}>
                 <div className="w-64 rounded-xl border bg-card shadow-xl p-3">
                   <div className="text-xs text-muted-foreground mb-2 px-1">Subcategories</div>
-                  <div className="grid grid-cols-1 gap-1">
+                  <div className="grid grid-cols-1 gap-1 max-h-[300px] overflow-y-auto scrollbar-thin scrollbar-thumb-primary/20 scrollbar-track-transparent hover:scrollbar-thumb-primary/40">
                     {(SUBCATEGORIES[cat] || []).map(sc => (
                       <button
                         key={sc}
