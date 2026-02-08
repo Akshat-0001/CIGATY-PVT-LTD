@@ -281,11 +281,11 @@ export default function AddListing() {
       <div className="rounded-2xl border bg-card p-6 space-y-4">
         <Input label="Product Name" value={productName} onChange={(e) => setProductName(e.target.value.slice(0,100))} required />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid md:grid-cols-2 gap-4">
           <div className="grid gap-2">
             <Label>Product Category</Label>
             <Select value={category} onValueChange={setCategory}>
-              <SelectTrigger className="h-12 md:h-10"><SelectValue placeholder="Select category" /></SelectTrigger>
+              <SelectTrigger><SelectValue placeholder="Select category" /></SelectTrigger>
               <SelectContent>
                 {categories.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
               </SelectContent>
@@ -294,7 +294,7 @@ export default function AddListing() {
           <div className="grid gap-2">
             <Label>Sub-category</Label>
             <Select value={subcategory} onValueChange={setSubcategory} disabled={!category || (SUBCATEGORIES[category]||[]).length===0}>
-              <SelectTrigger className="h-12 md:h-10"><SelectValue placeholder={category ? "Select sub-category" : "Choose category first"} /></SelectTrigger>
+              <SelectTrigger><SelectValue placeholder={category ? "Select sub-category" : "Choose category first"} /></SelectTrigger>
               <SelectContent>
                 {(SUBCATEGORIES[category] || []).map(sc => (
                   <SelectItem key={sc} value={sc}>{sc}</SelectItem>
@@ -304,23 +304,23 @@ export default function AddListing() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid md:grid-cols-3 gap-4">
           <div className="grid gap-2">
             <Label>Packaging</Label>
-            <div className="inline-flex w-full rounded-md border border-border overflow-hidden">
-              <button type="button" className={`flex-1 px-4 py-3 md:py-2 text-sm font-medium transition-colors ${packaging==='case'?'bg-primary text-primary-foreground':'bg-muted text-foreground hover:bg-muted/80'}`} onClick={() => setPackaging('case')}>Cases</button>
-              <button type="button" className={`flex-1 px-4 py-3 md:py-2 text-sm font-medium transition-colors ${packaging==='bottle'?'bg-primary text-primary-foreground':'bg-muted text-foreground hover:bg-muted/80'}`} onClick={() => setPackaging('bottle')}>Bottles</button>
+            <div className="inline-flex rounded-md border border-border overflow-hidden">
+              <button className={`px-4 py-2 ${packaging==='case'?'bg-primary text-primary-foreground':'bg-muted text-foreground'}`} onClick={() => setPackaging('case')}>Cases</button>
+              <button className={`px-4 py-2 ${packaging==='bottle'?'bg-primary text-primary-foreground':'bg-muted text-foreground'}`} onClick={() => setPackaging('bottle')}>Bottles</button>
             </div>
           </div>
           <Input label="Quantity" type="number" value={quantity} onChange={(e) => setQuantity(Number(e.target.value))} required />
           <Input label="Minimum Quantity (Optional)" type="number" value={minQty} onChange={(e) => setMinQty(Number(e.target.value))} />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid md:grid-cols-3 gap-4">
           <div className="grid gap-2">
             <Label>Content (Volume)</Label>
             <Select value={content} onValueChange={setContent}>
-              <SelectTrigger className="h-12 md:h-10"><SelectValue placeholder="Select content" /></SelectTrigger>
+              <SelectTrigger><SelectValue placeholder="Select content" /></SelectTrigger>
               <SelectContent>
                 {volumes.map(v => <SelectItem key={v} value={v}>{v}</SelectItem>)}
               </SelectContent>
@@ -329,7 +329,7 @@ export default function AddListing() {
           <div className="grid gap-2">
             <Label>Condition</Label>
             <Select value={condition} onValueChange={setCondition}>
-              <SelectTrigger className="h-12 md:h-10"><SelectValue /></SelectTrigger>
+              <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="Good">Good</SelectItem>
                 <SelectItem value="Fair">Fair</SelectItem>
@@ -339,7 +339,7 @@ export default function AddListing() {
           <div className="grid gap-2">
             <Label>Tax Status</Label>
             <Select value={duty} onValueChange={(v) => setDuty(v as any)}>
-              <SelectTrigger className="h-12 md:h-10"><SelectValue placeholder="Select tax status" /></SelectTrigger>
+              <SelectTrigger><SelectValue placeholder="Select tax status" /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="duty_paid">Duty Paid</SelectItem>
                 <SelectItem value="under_bond">Under Bond</SelectItem>
@@ -352,7 +352,7 @@ export default function AddListing() {
           <div className="grid gap-2">
             <Label>Inventory Location *</Label>
             <Select value={inventoryType} onValueChange={(v) => { setInventoryType(v as any); setWarehouseId(''); setCustomWarehouseName(''); }}>
-              <SelectTrigger className="h-12 md:h-10"><SelectValue placeholder="Select Inventory Type" /></SelectTrigger>
+              <SelectTrigger><SelectValue placeholder="Select Inventory Type" /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="bonded_warehouse">Bonded Warehouse</SelectItem>
                 <SelectItem value="through_brand">Through Brand</SelectItem>
@@ -365,7 +365,7 @@ export default function AddListing() {
               <Label>Bonded Warehouse *</Label>
               {bondedWarehouses.length > 0 ? (
               <Select value={warehouseId} onValueChange={setWarehouseId}>
-                <SelectTrigger className="h-12 md:h-10"><SelectValue placeholder="Select Bonded Warehouse" /></SelectTrigger>
+                <SelectTrigger><SelectValue placeholder="Select Bonded Warehouse" /></SelectTrigger>
                 <SelectContent>
                     {bondedWarehouses.map(w => <SelectItem key={w.id} value={w.id}>{w.name}</SelectItem>)}
                 </SelectContent>
@@ -389,11 +389,11 @@ export default function AddListing() {
           )}
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid md:grid-cols-2 gap-4">
           <div className="grid gap-2">
             <Label>Incoterms</Label>
             <Select value={incoterm} onValueChange={setIncoterm}>
-              <SelectTrigger className="h-12 md:h-10"><SelectValue /></SelectTrigger>
+              <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
                 {incoterms.map(i => <SelectItem key={i} value={i}>{i}</SelectItem>)}
               </SelectContent>
@@ -402,7 +402,7 @@ export default function AddListing() {
           <div className="grid gap-2">
             <Label>Lead Time</Label>
             <Select value={leadTime} onValueChange={setLeadTime}>
-              <SelectTrigger className="h-12 md:h-10"><SelectValue /></SelectTrigger>
+              <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
                 {leadTimes.map(i => <SelectItem key={i} value={i}>{i}</SelectItem>)}
               </SelectContent>
@@ -412,9 +412,9 @@ export default function AddListing() {
       </div>
 
       {/* Pricing */}
-      <div className="rounded-2xl border bg-card p-4 md:p-6 space-y-4">
+      <div className="rounded-2xl border bg-card p-6 space-y-4">
         {packaging === 'bottle' ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid md:grid-cols-2 gap-4">
             <Input label="Price per Bottle (€)" type="number" min={0} step="0.01" value={price} onChange={(e)=>setPrice(Number(e.target.value))} required />
             <div className="grid gap-2">
               <Label>Note</Label>
@@ -424,7 +424,7 @@ export default function AddListing() {
             </div>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid md:grid-cols-3 gap-4">
             <Input label="Bottles per Case" type="number" min={1} value={bottlesPerCase} onChange={(e)=>setBottlesPerCase(Number(e.target.value))} required />
             <Input label="Price per Case (€)" type="number" min={0} step="0.01" value={price} onChange={(e)=>setPrice(Number(e.target.value))} required />
             <div className="grid gap-2">
@@ -438,18 +438,18 @@ export default function AddListing() {
       </div>
 
       {/* Additional Info */}
-      <div className="rounded-2xl border bg-card p-4 md:p-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="rounded-2xl border bg-card p-6 grid md:grid-cols-3 gap-4">
         <Input label="ABV % (Optional)" type="number" value={abv} onChange={(e)=>setAbv(e.target.value===''? '': Number(e.target.value))} />
         <div className="grid gap-2">
           <Label>Refillable</Label>
-          <div className="inline-flex w-full rounded-md border border-border overflow-hidden">
-            <button type="button" className={`flex-1 px-4 py-3 md:py-2 text-sm font-medium transition-colors ${refillable==='yes'?'bg-primary text-primary-foreground':'bg-muted text-foreground hover:bg-muted/80'}`} onClick={()=>setRefillable('yes')}>Yes</button>
-            <button type="button" className={`flex-1 px-4 py-3 md:py-2 text-sm font-medium transition-colors ${refillable==='no'?'bg-primary text-primary-foreground':'bg-muted text-foreground hover:bg-muted/80'}`} onClick={()=>setRefillable('no')}>No</button>
+          <div className="inline-flex rounded-md border border-border overflow-hidden">
+            <button className={`px-4 py-2 ${refillable==='yes'?'bg-primary text-primary-foreground':'bg-muted text-foreground'}`} onClick={()=>setRefillable('yes')}>Yes</button>
+            <button className={`px-4 py-2 ${refillable==='no'?'bg-primary text-primary-foreground':'bg-muted text-foreground'}`} onClick={()=>setRefillable('no')}>No</button>
           </div>
         </div>
         <div className="grid gap-2">
           <Label>Expiry Date (Optional)</Label>
-          <input type="date" className="h-12 md:h-10 rounded-md border border-input bg-background px-3 py-2 text-sm" value={expiry} onChange={(e)=>setExpiry(e.target.value)} />
+          <input type="date" className="rounded-md border border-input bg-background px-3 py-2 text-sm" value={expiry} onChange={(e)=>setExpiry(e.target.value)} />
         </div>
       </div>
 
