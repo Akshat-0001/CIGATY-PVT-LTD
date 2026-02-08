@@ -11,13 +11,6 @@ import {
 import { Button } from '@/components/ui/button';
 
 const Home = () => {
-  const stats = [
-    { label: 'Verified Partners', value: '5,000+' },
-    { label: 'Global Brands', value: '600+' },
-    { label: 'Export Regions', value: '10+' },
-    { label: 'Annual Trade', value: '₹100 Cr+' },
-  ];
-
   const features = [
     {
       icon: Trophy,
@@ -86,20 +79,6 @@ const Home = () => {
                   Learn More
                 </Button>
               </Link>
-            </div>
-
-            {/* Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl mx-auto">
-              {stats.map((stat) => (
-                <div key={stat.label} className="bg-card rounded-lg p-4 border">
-                  <div className="text-2xl md:text-3xl font-bold text-primary mb-1">
-                    {stat.value}
-                  </div>
-                  <div className="text-xs md:text-sm text-muted-foreground">
-                    {stat.label}
-                  </div>
-                </div>
-              ))}
             </div>
           </div>
         </div>

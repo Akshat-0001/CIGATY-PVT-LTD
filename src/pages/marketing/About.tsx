@@ -1,4 +1,4 @@
-import { Target, Eye, Award, Users, Globe2, TrendingUp } from 'lucide-react';
+import { Target, Eye, Award } from 'lucide-react';
 
 const About = () => {
   const values = [
@@ -19,12 +19,6 @@ const About = () => {
     },
   ];
 
-  const stats = [
-    { icon: Users, value: '5,000+', label: 'Verified Partners' },
-    { icon: Globe2, value: '10+', label: 'Countries' },
-    { icon: TrendingUp, value: '₹100 Cr+', label: 'Annual Trade' },
-  ];
-
   return (
     <div className="min-h-screen pt-20">
       {/* Hero */}
@@ -37,28 +31,6 @@ const About = () => {
             <p className="text-lg md:text-xl text-muted-foreground">
               India's first B2B liquor exchange platform, transforming how premium drinks are traded globally
             </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Stats */}
-      <section className="py-12 border-y">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-            {stats.map((stat) => {
-              const Icon = stat.icon;
-              return (
-                <div key={stat.label} className="text-center">
-                  <Icon className="w-8 h-8 text-primary mx-auto mb-3" />
-                  <div className="text-3xl font-bold text-foreground mb-1">
-                    {stat.value}
-                  </div>
-                  <div className="text-muted-foreground">
-                    {stat.label}
-                  </div>
-                </div>
-              );
-            })}
           </div>
         </div>
       </section>
