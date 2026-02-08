@@ -112,7 +112,7 @@ export default function LiveOffers() {
 
   const CategoryTabs = () => (
     <motion.div
-      className="flex items-center gap-3 flex-wrap"
+      className="flex items-center gap-3 flex-wrap overflow-visible"
       initial="hidden"
       animate="visible"
       variants={staggerContainer}
@@ -312,7 +312,7 @@ export default function LiveOffers() {
     Object.values(filterWarehouses).filter(Boolean).length;
 
   return (
-    <div className="container py-4 md:py-8 px-4 space-y-4 md:space-y-6">
+    <div className="container py-4 md:py-8 px-4 space-y-4 md:space-y-6 overflow-visible min-h-screen">
       <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
         <h1 className="text-2xl md:text-3xl font-display font-semibold">Marketplace</h1>
         <div className="flex flex-wrap items-center gap-2">
