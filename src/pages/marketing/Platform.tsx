@@ -15,8 +15,15 @@ import {
   CheckCircle2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useState } from 'react';
 
 const Platform = () => {
+  const [loadedImages, setLoadedImages] = useState<Record<string, boolean>>({});
+  
+  const handleImageLoad = (key: string) => {
+    setLoadedImages(prev => ({ ...prev, [key]: true }));
+  };
+  
   const mainFeatures = [
     {
       icon: Package,
@@ -113,11 +120,16 @@ const Platform = () => {
 
             {/* Right: Mockup Image */}
             <div className="relative">
+              {!loadedImages['hero'] && (
+                <div className="w-full aspect-[4/3] bg-gradient-to-br from-muted to-muted/50 rounded-lg animate-pulse" />
+              )}
               <img 
                 src="/multi-device 2 marketplace.png" 
                 alt="CIGATY Platform Mockup"
-                className="w-full h-auto"
+                className={`w-full h-auto transition-opacity duration-300 ${loadedImages['hero'] ? 'opacity-100' : 'opacity-0 absolute inset-0'}`}
                 loading="eager"
+                fetchPriority="high"
+                onLoad={() => handleImageLoad('hero')}
               />
             </div>
           </div>
@@ -170,12 +182,16 @@ const Platform = () => {
                   </div>
 
                   {/* Mockup Image */}
-                  <div className={`${isEven ? '' : 'lg:col-start-1 lg:row-start-1'}`}>
+                  <div className={`${isEven ? '' : 'lg:col-start-1 lg:row-start-1'} relative`}>
+                    {!loadedImages[feature.title] && (
+                      <div className="w-full aspect-[4/3] bg-gradient-to-br from-muted to-muted/50 rounded-lg animate-pulse" />
+                    )}
                     <img 
                       src={feature.mockup} 
                       alt={`${feature.title} mockup`}
-                      className="w-full h-auto"
-                      loading="lazy"
+                      className={`w-full h-auto transition-opacity duration-300 ${loadedImages[feature.title] ? 'opacity-100' : 'opacity-0 absolute inset-0'}`}
+                      loading={index < 2 ? "eager" : "lazy"}
+                      onLoad={() => handleImageLoad(feature.title)}
                     />
                   </div>
                 </div>

@@ -9,8 +9,11 @@ import {
   Users,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useState } from 'react';
 
 const Home = () => {
+  const [imageLoaded, setImageLoaded] = useState(false);
+  
   const features = [
     {
       icon: Trophy,
@@ -114,11 +117,16 @@ const Home = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center max-w-7xl mx-auto">
             {/* Left: Mockup Image */}
             <div className="relative lg:pr-8">
+              {!imageLoaded && (
+                <div className="w-full aspect-[4/3] bg-gradient-to-br from-muted to-muted/50 rounded-lg animate-pulse" />
+              )}
               <img 
                 src="/main-page-mock-photo.png" 
                 alt="CIGATY Platform Interface"
-                className="w-full h-auto"
-                loading="lazy"
+                className={`w-full h-auto transition-opacity duration-300 ${imageLoaded ? 'opacity-100' : 'opacity-0 absolute inset-0'}`}
+                loading="eager"
+                fetchPriority="high"
+                onLoad={() => setImageLoaded(true)}
               />
             </div>
 
