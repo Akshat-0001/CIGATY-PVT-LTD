@@ -31,6 +31,15 @@ export default function AddListing() {
   const editId = searchParams.get('id');
   const isEdit = Boolean(editId);
   const [userId, setUserId] = useState<string>('');
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Check if mobile on mount and resize
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // step state
   const [packaging, setPackaging] = useState<'bottle'|'case'>('bottle');
@@ -577,9 +586,56 @@ export default function AddListing() {
         </Button>
       </div>
 
-      {/* Restrictions modal */}
-      <Dialog open={restrictionsOpen} onOpenChange={setRestrictionsOpen}>
-        <DialogContent className="max-w-[90vw] sm:max-w-md max-h-[80vh] overflow-y-auto">
+      {/* Restrictions modal - Use Sheet on mobile, Dialog on desktop */}
+      {/* Mobile: Sheet */}
+      <Sheet open={restrictionsOpen && isMobile} onOpenChange={setRestrictionsOpen}>
+        <SheetContent side="bottom" className="h-[85vh]">
+          <SheetHeader>
+            <SheetTitle>Market Restrictions</SheetTitle>
+          </SheetHeader>
+          <div className="mt-6 space-y-4 pb-24">
+            <div className="flex gap-2 w-full">
+              <button 
+                className={`flex-1 px-4 py-3 rounded-md transition-colors font-medium ${restrictionType==='exclude'?'bg-primary text-primary-foreground':'bg-muted text-foreground border border-border'}`} 
+                onClick={()=>setRestrictionType('exclude')}
+              >
+                Exclude
+              </button>
+              <button 
+                className={`flex-1 px-4 py-3 rounded-md transition-colors font-medium ${restrictionType==='include'?'bg-primary text-primary-foreground':'bg-muted text-foreground border border-border'}`} 
+                onClick={()=>setRestrictionType('include')}
+              >
+                Include
+              </button>
+            </div>
+            <div className="grid gap-2">
+              <Label>Countries</Label>
+              <Textarea 
+                placeholder="Enter country names separated by commas (e.g., India, France, Germany)" 
+                value={countries.join(', ')} 
+                onChange={(e)=>setCountries(e.target.value.split(',').map(s=>s.trim()).filter(Boolean))}
+                rows={6}
+                className="resize-none"
+              />
+              <p className="text-sm text-muted-foreground">
+                {restrictionType === 'exclude' 
+                  ? 'Product will NOT be sold in these countries' 
+                  : 'Product will ONLY be sold in these countries'}
+              </p>
+            </div>
+          </div>
+          <SheetFooter className="absolute bottom-0 left-0 right-0 p-6 bg-background border-t">
+            <div className="flex flex-col gap-2 w-full">
+              <Button variant="secondary" onClick={()=>setRestrictionsOpen(false)} size="lg" className="w-full">Done</Button>
+              <Button variant="outline" onClick={()=>setRestrictionsOpen(false)} size="lg" className="w-full">Cancel</Button>
+            </div>
+          </SheetFooter>
+        </SheetContent>
+      </Sheet>
+
+      {/* Desktop: Dialog */}
+      <Dialog open={restrictionsOpen && !isMobile} onOpenChange={setRestrictionsOpen}>
+        <DialogContent className="max-w-md">
           <DialogHeader><DialogTitle>Market Restrictions</DialogTitle></DialogHeader>
           <div className="grid gap-4 py-4">
             <div className="flex gap-2 w-full">
