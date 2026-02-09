@@ -11,7 +11,7 @@ All colors MUST be HSL.
 @layer base {
   :root {
     /* Force light theme always - ignore device dark mode */
-    color-scheme: light;
+    color-scheme: light !important;
     
     /* Light Theme - Warm Golden/Champagne Tint */
     --background: 42 45% 92%;
@@ -74,7 +74,7 @@ All colors MUST be HSL.
 
   .dark {
     /* Disable dark mode - use light theme colors instead */
-    color-scheme: light;
+    color-scheme: light !important;
     
     --background: 42 45% 92%;
     --foreground: 222 47% 12%;
@@ -125,6 +125,26 @@ All colors MUST be HSL.
     --sidebar-accent-foreground: 222 47% 12%;
     --sidebar-border: 210 26% 90%;
     --sidebar-ring: 46 65% 64%;
+  }
+
+  /* Force light mode even when system prefers dark */
+  @media (prefers-color-scheme: dark) {
+    :root {
+      color-scheme: light !important;
+      --background: 42 45% 92%;
+      --foreground: 222 47% 12%;
+    }
+    
+    html {
+      color-scheme: light !important;
+      background-color: hsl(42, 45%, 92%) !important;
+    }
+    
+    body {
+      color-scheme: light !important;
+      background-color: hsl(42, 45%, 92%) !important;
+      color: hsl(222, 47%, 12%) !important;
+    }
   }
 }
 

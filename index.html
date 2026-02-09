@@ -3,7 +3,31 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="color-scheme" content="light only" />
+    <meta name="color-scheme" content="light" />
+    <style>
+      /* Force light mode - override any system preferences */
+      :root {
+        color-scheme: light !important;
+      }
+      html {
+        color-scheme: light !important;
+        background-color: hsl(42, 45%, 92%) !important;
+      }
+      body {
+        color-scheme: light !important;
+        background-color: hsl(42, 45%, 92%) !important;
+      }
+      /* Prevent dark mode from being applied */
+      @media (prefers-color-scheme: dark) {
+        :root {
+          color-scheme: light !important;
+        }
+        html, body {
+          background-color: hsl(42, 45%, 92%) !important;
+          color: hsl(222, 47%, 12%) !important;
+        }
+      }
+    </style>
     <title>CIGATY Trade Portal</title>
     <meta name="description" content="CIGATY — India’s First B2B Liquor Exchange. Trade spirits, wines, beers, and premium beverages seamlessly across verified partners." />
     <meta name="author" content="CIGATY" />
@@ -30,5 +54,34 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <script>
+      // Force light mode - remove any dark class that might be added
+      (function() {
+        // Remove dark class immediately
+        document.documentElement.classList.remove('dark');
+        document.body.classList.remove('dark');
+        
+        // Watch for any attempts to add dark class
+        const observer = new MutationObserver(function(mutations) {
+          mutations.forEach(function(mutation) {
+            if (mutation.attributeName === 'class') {
+              if (document.documentElement.classList.contains('dark')) {
+                document.documentElement.classList.remove('dark');
+              }
+              if (document.body.classList.contains('dark')) {
+                document.body.classList.remove('dark');
+              }
+            }
+          });
+        });
+        
+        observer.observe(document.documentElement, { attributes: true });
+        observer.observe(document.body, { attributes: true });
+        
+        // Force light color scheme
+        document.documentElement.style.colorScheme = 'light';
+        document.body.style.colorScheme = 'light';
+      })();
+    </script>
   </body>
 </html>

@@ -49,45 +49,60 @@ const Home = () => {
       {/* Hero Section */}
       <section className="relative py-20 md:py-32 bg-gradient-to-b from-primary/5 to-background">
         <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto text-center">
-            <div className="inline-flex items-center bg-primary/10 rounded-full px-4 py-2 mb-6 border border-primary/20">
-              <span className="text-primary font-semibold text-sm">
-                INDIA'S FIRST B2B LIQUOR EXCHANGE
-              </span>
+          <div className="max-w-4xl mx-auto">
+            {/* Centered Content */}
+            <div className="text-center mb-12">
+              <div className="inline-flex items-center bg-primary/10 rounded-full px-4 py-2 mb-6 border border-primary/20">
+                <span className="text-primary font-semibold text-sm">
+                  INDIA'S FIRST B2B LIQUOR EXCHANGE
+                </span>
+              </div>
+
+              <h1 className="text-4xl md:text-6xl font-bold text-foreground mb-6 leading-tight">
+                Trade Premium Drinks
+                <br />
+                <span className="text-primary">Globally</span>
+              </h1>
+
+              <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
+                Connect premium spirits and wine brands with distributors worldwide. 
+                Your trusted B2B platform for seamless global trade.
+              </p>
+
+              <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
+                <Link to="/register">
+                  <Button size="lg" className="w-full sm:w-auto">
+                    Get Started
+                    <ArrowRight className="ml-2" size={20} />
+                  </Button>
+                </Link>
+                <Link to="/platform">
+                  <Button size="lg" variant="outline" className="w-full sm:w-auto">
+                    Learn More
+                  </Button>
+                </Link>
+              </div>
             </div>
 
-            <h1 className="text-4xl md:text-6xl font-bold text-foreground mb-6 leading-tight">
-              Trade Premium Drinks
-              <br />
-              <span className="text-primary">Globally</span>
-            </h1>
-
-            <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-              Connect premium spirits and wine brands with distributors worldwide. 
-              Your trusted B2B platform for seamless global trade.
-            </p>
-
-            <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-              <Link to="/register">
-                <Button size="lg" className="w-full sm:w-auto">
-                  Get Started
-                  <ArrowRight className="ml-2" size={20} />
-                </Button>
-              </Link>
-              <Link to="/platform">
-                <Button size="lg" variant="outline" className="w-full sm:w-auto">
-                  Learn More
-                </Button>
-              </Link>
+            {/* Video Placeholder Below */}
+            <div className="relative max-w-4xl mx-auto">
+              <div className="aspect-video w-full bg-gradient-to-br from-primary/20 to-primary/5 rounded-2xl border-2 border-primary/20 flex items-center justify-center shadow-xl">
+                <div className="text-center">
+                  <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-primary/20 flex items-center justify-center">
+                    <div className="w-0 h-0 border-t-[12px] border-t-transparent border-l-[20px] border-l-primary border-b-[12px] border-b-transparent ml-1"></div>
+                  </div>
+                  <p className="text-muted-foreground font-medium">Video Coming Soon</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
       {/* Features Section */}
-      <section className="py-16 md:py-24">
+      <section className="py-16 md:py-24 bg-gradient-to-b from-background to-primary/5">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
+          <div className="text-center mb-16">
             <h2 className="text-3xl md:text-5xl font-bold text-foreground mb-4">
               Why Choose <span className="text-primary">CIGATY</span>
             </h2>
@@ -96,29 +111,43 @@ const Home = () => {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
-            {features.map((feature) => {
-              const Icon = feature.icon;
-              return (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center max-w-7xl mx-auto">
+            {/* Left: Mockup Image */}
+            <div className="relative lg:pr-8">
+              <img 
+                src="/main-page-mock-photo.png" 
+                alt="CIGATY Platform Interface"
+                className="w-full h-auto"
+                loading="lazy"
+              />
+            </div>
+
+            {/* Right: Features List */}
+            <div className="space-y-6">
+              {features.map((feature, index) => (
                 <div
                   key={feature.title}
-                  className="bg-card rounded-lg p-6 border hover:border-primary/50 transition-colors"
+                  className="group"
                 >
-                  <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
-                    <Icon className="w-6 h-6 text-primary" />
+                  <div className="flex items-baseline gap-3">
+                    <span className="text-primary font-bold text-lg flex-shrink-0">
+                      {String(index + 1).padStart(2, '0')}
+                    </span>
+                    <div>
+                      <h3 className="text-xl font-bold text-foreground mb-1.5 group-hover:text-primary transition-colors">
+                        {feature.title}
+                      </h3>
+                      <p className="text-muted-foreground leading-relaxed">
+                        {feature.description}
+                      </p>
+                    </div>
                   </div>
-                  <h3 className="text-xl font-bold text-foreground mb-2">
-                    {feature.title}
-                  </h3>
-                  <p className="text-muted-foreground">
-                    {feature.description}
-                  </p>
                 </div>
-              );
-            })}
+              ))}
+            </div>
           </div>
 
-          <div className="text-center mt-12">
+          <div className="text-center mt-16">
             <Link to="/platform">
               <Button variant="outline" size="lg">
                 See All Features

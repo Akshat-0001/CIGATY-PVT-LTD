@@ -238,10 +238,10 @@ export default function LiveOffers() {
   );
 
   const ListRow = ({ row, index }: { row: any; index: number }) => (
-    <div>
+    <div className="w-full">
       <Link
         to={`/product/${row.id}`}
-        className="group relative grid grid-cols-[1fr,auto] md:grid-cols-[3fr,1fr,1fr,2fr,2fr] gap-4 p-4 rounded-2xl border bg-card glass-card shadow-sm transition-all duration-300 hover:shadow-xl hover:shadow-primary/10"
+        className="group relative flex flex-col md:grid md:grid-cols-[3fr,1fr,1fr,2fr,2fr] gap-3 md:gap-4 p-4 rounded-2xl border bg-card glass-card shadow-sm transition-all duration-300 hover:shadow-xl hover:shadow-primary/10"
       >
       {/* Half-outside NEW badge at top-left (only for <30 days) */}
       {isNew(row.created_at) && (
@@ -251,22 +251,29 @@ export default function LiveOffers() {
       )}
       <div className="pointer-events-none absolute inset-0 opacity-0 group-hover:opacity-100"
            style={{ background: "radial-gradient(1200px 200px at top, rgba(59,130,246,0.10), transparent 50%)" }} />
-      <div className="flex items-center gap-4">
-        <div className="h-20 w-20 rounded-lg overflow-hidden bg-muted border flex items-center justify-center ring-1 ring-transparent group-hover:ring-primary/20 transition">
+      
+      {/* Mobile: Horizontal layout */}
+      <div className="flex items-center gap-4 w-full">
+        <div className="h-20 w-20 flex-shrink-0 rounded-lg overflow-hidden bg-muted border flex items-center justify-center ring-1 ring-transparent group-hover:ring-primary/20 transition">
           {Array.isArray(row.image_urls) && row.image_urls.length > 0 ? (
             <img src={row.image_urls[0]} alt={row.product_name} className="h-full w-full object-cover" />
           ) : (
             <span className="text-xs text-muted-foreground">IMG</span>
           )}
         </div>
-        <div className="min-w-0">
-          <h3 className="truncate font-medium text-sm text-black">{row.product_name}</h3>
+        <div className="flex-1 min-w-0">
+          <h3 className="truncate font-medium text-sm text-black mb-1">{row.product_name}</h3>
+          <div className="flex flex-col gap-0.5">
+            <p className="font-semibold text-sm">{priceLabel(row)}</p>
+            <p className="text-xs text-muted-foreground">Per Case • {row.duty === "under_bond" ? "Under Bond" : "Duty Paid"}</p>
+          </div>
         </div>
       </div>
 
+      {/* Desktop columns (hidden on mobile) */}
       <div className="hidden md:flex items-center text-sm">{row.quantity}</div>
 
-      <div className="flex flex-col justify-center items-end md:items-start">
+      <div className="hidden md:flex flex-col justify-center items-start">
         <p className="font-semibold">{priceLabel(row)}</p>
         <p className="text-xs text-muted-foreground">Per Case</p>
         <p className="text-xs text-muted-foreground">{row.duty === "under_bond" ? "Under Bond" : "Duty Paid"}</p>
@@ -368,7 +375,7 @@ export default function LiveOffers() {
     Object.values(filterWarehouses).filter(Boolean).length;
 
   return (
-    <div className="container py-4 md:py-8 px-4 space-y-4 md:space-y-6 overflow-visible min-h-screen">
+    <div className="container py-4 md:py-8 px-4 space-y-4 md:space-y-6 overflow-visible min-h-screen max-w-full">
       <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
         <h1 className="text-2xl md:text-3xl font-display font-semibold">Marketplace</h1>
         <div className="flex items-center gap-2">

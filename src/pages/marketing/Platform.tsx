@@ -3,7 +3,6 @@ import {
   Package,
   TrendingUp,
   Shield,
-  Megaphone,
   Bell,
   Globe,
   BarChart3,
@@ -29,6 +28,7 @@ const Platform = () => {
         'Multi-language descriptions',
         'Automated inventory tracking',
       ],
+      mockup: '/add-listing.png',
     },
     {
       icon: TrendingUp,
@@ -40,6 +40,7 @@ const Platform = () => {
         'Historical price trends',
         'Demand forecasting',
       ],
+      mockup: '/inventory.png',
     },
     {
       icon: Shield,
@@ -51,17 +52,7 @@ const Platform = () => {
         'Import/export documentation',
         'Tax calculation automation',
       ],
-    },
-    {
-      icon: Megaphone,
-      title: 'Brand Activation',
-      description: 'Marketing suite to amplify your brand presence.',
-      features: [
-        'Featured promotions',
-        'Email campaigns',
-        'Banner advertising',
-        'Event promotion tools',
-      ],
+      mockup: '/restrictions.png',
     },
     {
       icon: Bell,
@@ -73,6 +64,7 @@ const Platform = () => {
         'Opportunity matches',
         'Custom preferences',
       ],
+      mockup: '/notifications.png',
     },
     {
       icon: Globe,
@@ -84,6 +76,7 @@ const Platform = () => {
         'Touch-optimized interface',
         'Cross-browser compatible',
       ],
+      mockup: '/multi-device 1 main page.png',
     },
   ];
 
@@ -101,19 +94,32 @@ const Platform = () => {
       {/* Hero */}
       <section className="py-16 md:py-24 bg-gradient-to-b from-primary/5 to-background">
         <div className="container mx-auto px-4">
-          <div className="max-w-3xl mx-auto text-center">
-            <h1 className="text-4xl md:text-6xl font-bold text-foreground mb-6">
-              The Most <span className="text-primary">Powerful</span> Platform
-            </h1>
-            <p className="text-lg md:text-xl text-muted-foreground mb-8">
-              Everything you need to manage, grow, and scale your global drinks business
-            </p>
-            <Link to="/register">
-              <Button size="lg">
-                Get Started
-                <ArrowRight className="ml-2" size={20} />
-              </Button>
-            </Link>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            {/* Left: Text Content */}
+            <div className="text-center lg:text-left">
+              <h1 className="text-4xl md:text-6xl font-bold text-foreground mb-6">
+                The Most <span className="text-primary">Powerful</span> Platform
+              </h1>
+              <p className="text-lg md:text-xl text-muted-foreground mb-8">
+                Everything you need to manage, grow, and scale your global drinks business
+              </p>
+              <Link to="/register">
+                <Button size="lg">
+                  Get Started
+                  <ArrowRight className="ml-2" size={20} />
+                </Button>
+              </Link>
+            </div>
+
+            {/* Right: Mockup Image */}
+            <div className="relative">
+              <img 
+                src="/multi-device 2 marketplace.png" 
+                alt="CIGATY Platform Mockup"
+                className="w-full h-auto"
+                loading="eager"
+              />
+            </div>
           </div>
         </div>
       </section>
@@ -121,7 +127,7 @@ const Platform = () => {
       {/* Main Features */}
       <section className="py-16 md:py-24">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
+          <div className="text-center mb-16">
             <h2 className="text-3xl md:text-5xl font-bold text-foreground mb-4">
               Core <span className="text-primary">Features</span>
             </h2>
@@ -130,28 +136,48 @@ const Platform = () => {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
-            {mainFeatures.map((feature) => {
+          <div className="space-y-24 max-w-7xl mx-auto">
+            {mainFeatures.map((feature, index) => {
               const Icon = feature.icon;
+              const isEven = index % 2 === 0;
+              
               return (
-                <div key={feature.title} className="bg-card rounded-lg p-6 border">
-                  <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
-                    <Icon className="w-6 h-6 text-primary" />
+                <div 
+                  key={feature.title} 
+                  className={`grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center ${
+                    isEven ? '' : 'lg:grid-flow-dense'
+                  }`}
+                >
+                  {/* Content */}
+                  <div className={`${isEven ? '' : 'lg:col-start-2'}`}>
+                    <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center mb-6">
+                      <Icon className="w-7 h-7 text-primary" />
+                    </div>
+                    <h3 className="text-2xl md:text-3xl font-bold text-foreground mb-4">
+                      {feature.title}
+                    </h3>
+                    <p className="text-lg text-muted-foreground mb-6">
+                      {feature.description}
+                    </p>
+                    <ul className="space-y-3">
+                      {feature.features.map((item, idx) => (
+                        <li key={idx} className="flex items-start gap-3">
+                          <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+                          <span className="text-foreground">{item}</span>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
-                  <h3 className="text-xl font-bold text-foreground mb-2">
-                    {feature.title}
-                  </h3>
-                  <p className="text-muted-foreground mb-4">
-                    {feature.description}
-                  </p>
-                  <ul className="space-y-2">
-                    {feature.features.map((item, idx) => (
-                      <li key={idx} className="flex items-start gap-2 text-sm">
-                        <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                        <span className="text-muted-foreground">{item}</span>
-                      </li>
-                    ))}
-                  </ul>
+
+                  {/* Mockup Image */}
+                  <div className={`${isEven ? '' : 'lg:col-start-1 lg:row-start-1'}`}>
+                    <img 
+                      src={feature.mockup} 
+                      alt={`${feature.title} mockup`}
+                      className="w-full h-auto"
+                      loading="lazy"
+                    />
+                  </div>
                 </div>
               );
             })}
