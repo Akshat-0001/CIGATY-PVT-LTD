@@ -58,6 +58,7 @@ export default function AddListing() {
 
   const [images, setImages] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // restrictions modal
   const [restrictionsOpen, setRestrictionsOpen] = useState(false);
@@ -115,22 +116,43 @@ export default function AddListing() {
   }, [navigate, editId]);
 
   const onImages = async (files: FileList | null) => {
-    if (!files) return;
+    if (!files || files.length === 0) return;
     const arr = Array.from(files);
     if (images.length + arr.length > 3) {
       toast.error('Max 3 images allowed');
       return;
     }
     const tooBig = arr.find(f => f.size > 5 * 1024 * 1024);
-    if (tooBig) { toast.error('Max size 5MB per image'); return; }
-    const merged = [...images, ...arr];
-    setImages(merged);
-    setImagePreviews(merged.map(f => URL.createObjectURL(f)));
+    if (tooBig) { 
+      toast.error('Max size 5MB per image'); 
+      return; 
+    }
+    
+    try {
+      const merged = [...images, ...arr];
+      setImages(merged);
+      
+      // Create previews
+      const previews = await Promise.all(
+        merged.map(f => {
+          return new Promise<string>((resolve) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result as string);
+            reader.readAsDataURL(f);
+          });
+        })
+      );
+      setImagePreviews(previews);
+      toast.success(`${arr.length} image(s) added`);
+    } catch (error) {
+      console.error('Error loading images:', error);
+      toast.error('Failed to load images');
+    }
   };
 
   const clearImages = () => {
-    imagePreviews.forEach(url => URL.revokeObjectURL(url));
-    setImages([]); setImagePreviews([]);
+    setImages([]); 
+    setImagePreviews([]);
   };
 
   const uploadImages = async (): Promise<string[]> => {
@@ -197,8 +219,20 @@ export default function AddListing() {
   const submit = async (addAnother = false) => {
     const msg = validateCore();
     if (msg) { toast.error(msg); return; }
+    
+    // Prevent double submission
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+    
     try {
-      const imgs = await uploadImages();
+      // Upload images first
+      let imgs: string[] = [];
+      if (images.length > 0) {
+        toast.loading('Uploading images...', { id: 'upload' });
+        imgs = await uploadImages();
+        toast.dismiss('upload');
+      }
+      
       if (isEdit && editId) {
         const { error: upErr } = await (supabase as any)
           .from('listings')
@@ -218,7 +252,7 @@ export default function AddListing() {
             warehouse_id: inventoryType === 'bonded_warehouse' ? warehouseId || null : null,
             custom_warehouse_name: inventoryType === 'other' ? customWarehouseName : null,
             incoterm, lead_time: leadTime,
-            image_urls: imagePreviews.concat([]),
+            image_urls: imgs.length > 0 ? imgs : imagePreviews,
             currency, duty,
           })
           .eq('id', editId);
@@ -227,6 +261,7 @@ export default function AddListing() {
         navigate('/my-stock');
         return;
       }
+      
       const { data, error } = await supabase.rpc('insert_listing_full', {
         _product_name: productName,
         _category: category,
@@ -261,11 +296,14 @@ export default function AddListing() {
       toast.success('Saved as draft. You can Make Live from My Stock.');
       if (addAnother) {
         setProductName(''); setCategory(''); setSubcategory(''); setPackaging('bottle'); setQuantity(0); setMinQty(1); setContent(''); setCondition('Good'); setCustomStatus('T2'); setInventoryType('bonded_warehouse'); setWarehouseId(''); setCustomWarehouseName(''); setIncoterm(incoterms[0]); setLeadTime(leadTimes[1]); setBottlesPerCase(0); setPrice(0); setAbv(''); setRefillable('yes'); setExpiry(''); clearImages(); setCountries([]);
+        setIsSubmitting(false);
         return;
       }
       navigate('/my-stock');
     } catch (e: any) {
+      console.error('Submit error:', e);
       toast.error(e.message || 'Failed to submit');
+      setIsSubmitting(false);
     }
   };
 
@@ -466,7 +504,18 @@ export default function AddListing() {
             {imagePreviews.map((src, idx) => (
               <div key={idx} className="relative w-28 h-28 border rounded-md overflow-hidden">
                 <img src={src} alt="preview" className="object-cover w-full h-full" />
-                <button className="absolute top-1 right-1 bg-background/80 rounded-full p-1 border border-border" onClick={() => { const next = [...images]; next.splice(idx,1); setImages(next); const p=[...imagePreviews]; URL.revokeObjectURL(p[idx]); p.splice(idx,1); setImagePreviews(p); }}>
+                <button 
+                  type="button"
+                  className="absolute top-1 right-1 bg-background/80 rounded-full p-1 border border-border" 
+                  onClick={() => { 
+                    const nextImages = [...images]; 
+                    nextImages.splice(idx, 1); 
+                    setImages(nextImages); 
+                    const nextPreviews = [...imagePreviews]; 
+                    nextPreviews.splice(idx, 1); 
+                    setImagePreviews(nextPreviews); 
+                  }}
+                >
                   <X className="w-4 h-4 text-foreground" />
                 </button>
               </div>
@@ -494,6 +543,7 @@ export default function AddListing() {
           onClick={saveDraft}
           size="md"
           className="sm:flex-none"
+          disabled={isSubmitting}
         >
           Save as Draft
         </Button>
@@ -503,22 +553,25 @@ export default function AddListing() {
           onClick={()=>submit(false)}
           size="md"
           className="sm:flex-none"
+          disabled={isSubmitting}
         >
-          Submit
+          {isSubmitting ? 'Submitting...' : 'Submit'}
         </Button>
         <Button 
           variant="primary"
           onClick={()=>submit(true)}
           size="md"
           className="sm:flex-none"
+          disabled={isSubmitting}
         >
-          Submit & Add Another
+          {isSubmitting ? 'Submitting...' : 'Submit & Add Another'}
         </Button>
         <Button 
           variant="ghost" 
           onClick={()=>navigate('/my-stock')}
           size="md"
           className="sm:flex-none"
+          disabled={isSubmitting}
         >
           Cancel
         </Button>
