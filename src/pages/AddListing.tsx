@@ -537,12 +537,41 @@ export default function AddListing() {
       {/* Restricted Markets */}
       <div className="rounded-2xl border bg-card p-6 space-y-3">
         <div className="text-sm text-muted-foreground">If no restrictions applied, your product will be sold worldwide. If exclude is applied, your product will not be sold in selected countries. If include is applied, your product will only be sold in selected countries.</div>
+        
+        {/* Show applied restrictions */}
+        {countries.length > 0 && (
+          <div className="rounded-lg border border-primary/20 bg-primary/5 p-4 space-y-2">
+            <div className="flex items-center justify-between">
+              <div className="font-medium text-sm">
+                {restrictionType === 'exclude' ? 'Excluded Countries' : 'Included Countries'}
+              </div>
+              <Badge variant={restrictionType === 'exclude' ? 'destructive' : 'default'}>
+                {restrictionType === 'exclude' ? 'Exclude' : 'Include'}
+              </Badge>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {countries.map((country, idx) => (
+                <Badge key={idx} variant="secondary" className="gap-1">
+                  {country}
+                  <button
+                    type="button"
+                    onClick={() => setCountries(countries.filter((_, i) => i !== idx))}
+                    className="ml-1 hover:text-destructive"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </Badge>
+              ))}
+            </div>
+          </div>
+        )}
+        
         <Button 
           variant="outline" 
           onClick={()=>setRestrictionsOpen(true)}
           size="md"
         >
-          + Apply Market Restrictions
+          {countries.length > 0 ? 'Edit Market Restrictions' : '+ Apply Market Restrictions'}
         </Button>
       </div>
 
