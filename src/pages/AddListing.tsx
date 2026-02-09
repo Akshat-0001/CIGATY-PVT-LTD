@@ -625,7 +625,7 @@ export default function AddListing() {
               </p>
             </div>
           </div>
-          <SheetFooter className="absolute bottom-0 left-0 right-0 p-6 bg-background border-t">
+          <SheetFooter className="absolute bottom-0 left-0 right-0 p-6 pb-24 bg-background border-t">
             <div className="flex flex-col gap-2 w-full">
               <Button variant="secondary" onClick={()=>setRestrictionsOpen(false)} size="lg" className="w-full">Done</Button>
               <Button variant="outline" onClick={()=>setRestrictionsOpen(false)} size="lg" className="w-full">Cancel</Button>
