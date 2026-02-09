@@ -579,18 +579,42 @@ export default function AddListing() {
 
       {/* Restrictions modal */}
       <Dialog open={restrictionsOpen} onOpenChange={setRestrictionsOpen}>
-        <DialogContent>
+        <DialogContent className="max-w-[90vw] sm:max-w-md max-h-[80vh] overflow-y-auto">
           <DialogHeader><DialogTitle>Market Restrictions</DialogTitle></DialogHeader>
-          <div className="grid gap-4">
-            <div className="inline-flex rounded-md border border-border overflow-hidden w-max">
-              <button className={`px-4 py-2 ${restrictionType==='exclude'?'bg-primary text-primary-foreground':'bg-muted text-foreground'}`} onClick={()=>setRestrictionType('exclude')}>Exclude</button>
-              <button className={`px-4 py-2 ${restrictionType==='include'?'bg-primary text-primary-foreground':'bg-muted text-foreground'}`} onClick={()=>setRestrictionType('include')}>Include</button>
+          <div className="grid gap-4 py-4">
+            <div className="flex gap-2 w-full">
+              <button 
+                className={`flex-1 px-4 py-2 rounded-md transition-colors ${restrictionType==='exclude'?'bg-primary text-primary-foreground':'bg-muted text-foreground border border-border'}`} 
+                onClick={()=>setRestrictionType('exclude')}
+              >
+                Exclude
+              </button>
+              <button 
+                className={`flex-1 px-4 py-2 rounded-md transition-colors ${restrictionType==='include'?'bg-primary text-primary-foreground':'bg-muted text-foreground border border-border'}`} 
+                onClick={()=>setRestrictionType('include')}
+              >
+                Include
+              </button>
             </div>
-            <Textarea placeholder="Enter country names separated by commas (e.g., India, France, Germany)" value={countries.join(', ')} onChange={(e)=>setCountries(e.target.value.split(',').map(s=>s.trim()).filter(Boolean))} />
+            <div className="grid gap-2">
+              <Label>Countries</Label>
+              <Textarea 
+                placeholder="Enter country names separated by commas (e.g., India, France, Germany)" 
+                value={countries.join(', ')} 
+                onChange={(e)=>setCountries(e.target.value.split(',').map(s=>s.trim()).filter(Boolean))}
+                rows={4}
+                className="resize-none"
+              />
+              <p className="text-xs text-muted-foreground">
+                {restrictionType === 'exclude' 
+                  ? 'Product will NOT be sold in these countries' 
+                  : 'Product will ONLY be sold in these countries'}
+              </p>
+            </div>
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={()=>setRestrictionsOpen(false)} size="md">Cancel</Button>
-            <Button variant="secondary" onClick={()=>setRestrictionsOpen(false)} size="md">Done</Button>
+          <DialogFooter className="flex-col sm:flex-row gap-2">
+            <Button variant="outline" onClick={()=>setRestrictionsOpen(false)} size="md" className="w-full sm:w-auto">Cancel</Button>
+            <Button variant="secondary" onClick={()=>setRestrictionsOpen(false)} size="md" className="w-full sm:w-auto">Done</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

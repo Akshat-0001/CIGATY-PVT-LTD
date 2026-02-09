@@ -143,7 +143,15 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
-      <HotToaster position="top-center" />
+      <HotToaster 
+        position="bottom-right" 
+        toastOptions={{
+          style: {
+            zIndex: 9999,
+          },
+          className: 'mb-16 md:mb-4',
+        }}
+      />
       <BrowserRouter>
         <AppLayout />
       </BrowserRouter>
